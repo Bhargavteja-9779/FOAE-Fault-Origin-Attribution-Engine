@@ -34,10 +34,10 @@ bryant1994,park2008}, we model the contact resistance as a logistic law in
 log-resistance,
 \begin{equation}
 \ln R(N)=\ln R_0+\left(\ln R_{\max}-\ln R_0\right)\,
-\sigma\!\left(\frac{N-N_{50}}{w}\right),
+S\!\left(\frac{N-N_{50}}{w}\right),
 \label{eq:wear}
 \end{equation}
-where $\sigma(\cdot)$ is the logistic function, $R_0$ the as-new
+where $S(x)=1/(1+e^{-x})$ is the logistic function, $R_0$ the as-new
 resistance, $R_{\max}$ the saturated resistance, $N_{50}$ the
 unit-specific mid-life exposure and $w$ the knee width. Exposure
 accumulates from vibration and thermal cycling,
@@ -69,7 +69,9 @@ excitation proxy is only an imperfect measurement of the true stimulus.
 
 \subsection{Intermittency}
 Under vibration, the instantaneous resistance of a fretted contact
-fluctuates about $R$. Modelling the fluctuation as log-normal with spread
+fluctuates about $R$, producing the vibration-induced intermittent faults
+measured by Shen \emph{et al.}~\cite{shen2018tcpmt}, whose onset shows the
+threshold behaviour reported by Flowers \emph{et al.}~\cite{flowers2004}. Modelling the fluctuation as log-normal with spread
 $\sigma$, the probability that a micro-motion cycle produces an excursion
 above the discontinuity threshold $R_{\mathrm{th}}$~\cite{uscar2} is
 $\Phi\big((\ln R-\ln R_{\mathrm{th}})/\sigma\big)$. Interruptions therefore

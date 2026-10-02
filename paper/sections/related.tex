@@ -8,14 +8,23 @@ tin-plated contact are progressively replaced by an insulating debris layer;
 contact resistance stays near its initial milliohm level for an incubation
 period and then rises steeply, often by several orders of magnitude, within
 a comparatively small number of additional cycles~\cite{antler1985,
-bryant1994,park2008}. Vibration-driven fretting in automotive connectors,
-and the dependence of the degradation rate on vibration amplitude and
-spectrum, have been studied experimentally~\cite{flowers2004}. Industry
+bryant1994,park2008}. Fretting in automotive connectors has been reviewed
+by Park \emph{et al.}~\cite{park2006ijat}, and Flowers \emph{et
+al.}~\cite{flowers2004} showed that its onset exhibits a vibration
+threshold at each excitation frequency. Shen \emph{et al.} measured the
+dynamic contact resistance of connectors under vibration and characterized
+the resulting intermittent faults~\cite{shen2018tcpmt}, and showed that
+contact-resistance degradation impairs high-speed signal transmission,
+which permits on-line diagnosis by monitoring the signal that passes
+through the connector~\cite{shen2017access}. Industry
 qualification tests (e.g., USCAR-2~\cite{uscar2}) define an electrical
 discontinuity as a resistance excursion above \SI{7}{\ohm} lasting at least
-\SI{1}{\micro\second} during vibration. These works characterize the
-\emph{connector}; they do not address how a degraded connector manifests in
-the \emph{data} of the system it serves, which is the question here.
+\SI{1}{\micro\second} during vibration. These works either characterize the
+connector on a test bench or diagnose it by instrumenting the link (e.g.,
+measuring resistance or signal integrity). None addresses how a degraded
+connector manifests in the \emph{application-level data} that an attached
+device already records---without added measurement hardware---which is
+the question here.
 
 \subsection{Timing and Physical-Layer Analysis of In-Vehicle Networks}
 A large literature exploits the timing and electrical characteristics of
