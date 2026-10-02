@@ -1,0 +1,86 @@
+\section{Excitation-Coherent Telemetry Analysis}
+\label{sec:method}
+
+ECTA processes the tool's telemetry in windows (30~s for full-bus
+captures, 60~s for sampling loggers, 120~s or one trip for polling) and
+computes three feature families. All features are \emph{self-referenced}:
+none requires a healthy recording of the same vehicle or tool.
+
+\subsection{Loss Features}
+For a passive capture, each identifier $k$ whose inter-arrival times are
+predominantly within $[0.5,1.5]$ of their median $P_k$ is treated as
+periodic. A gap $\Delta$ implies $\mathrm{round}(\Delta/P_k)-1$ missing
+frames. We aggregate the missing-frame ratio, missing frames and gap events
+per minute, all-identifier silences, the longest silence and the frame
+rate. For a polling tester the corresponding quantities are derived from the
+inter-response gaps relative to the loop period: the share and rate of
+timeout-like gaps, the excess time fraction, long gaps ($>0.8$~s, the
+re-initialisation signature), the longest gap and the per-PID cycle
+completeness.
+
+\subsection{Structure Features}
+These describe \emph{how} losses are distributed, which is what separates
+the origins of Section~\ref{sec:model}:
+\emph{selectivity}---a $\chi^2$ statistic and a Gini coefficient of
+per-identifier losses against the airtime-proportional pattern that a DLC
+fault produces (an ECU-side fault concentrates losses on few identifiers);
+\emph{lateness and bunching}---the share of intervals slightly above the
+period without a missing frame, and below half the period (retransmission
+and backlog release); \emph{jitter}; and \emph{load coupling}---the local
+frame density at the moment of loss relative to the window mean, and the
+rank correlation between per-second losses and per-second load (logger
+overflow). For polling, the median and dispersion of timeout-gap durations
+distinguish a tester re-initialisation from a run of ECU timeouts.
+
+\subsection{Excitation-Coherence Features}
+The tool decodes engine and vehicle speed from the frames or responses it
+did receive (for passive captures, from broadcast signals; for polling,
+from PIDs \texttt{0x0C} and \texttt{0x0D}), forming the observed proxy
+$\hat v(t)=w_e n(t)/2000+w_r s(t)/60$ on a 1--2~s grid. Let $y_j$ be the
+count of loss events in bin $j$. ECTA fits the Poisson generalized linear
+model~\cite{mccullagh1989}
+\begin{equation}
+y_j\sim\mathrm{Poisson}\big(\exp(\alpha+\beta\,x_j)\big),\quad
+x_j=\mathrm{std}\big(\ln(\hat v_j+0.05)\big),
+\label{eq:glm}
+\end{equation}
+by iteratively reweighted least squares and records the slope
+$\hat\beta$, its Wald statistic $z_\beta=\hat\beta/\widehat{\mathrm{se}}(\hat\beta)$,
+the Spearman correlation between $y$ and $\hat v$, and the log ratio of
+loss rates above and below the median excitation. Under (\ref{eq:rate}),
+DLC losses have $\beta>0$; overflow and random loss have $\beta\approx0$.
+The statistics are computed twice: for all loss events, and for strong
+events only (silences or gaps exceeding three loop periods), which isolates
+brown-outs from the tool's own background irregularity.
+
+On its own, $z_\beta$ is a training-free test: it needs no labels and no
+healthy data from the target vehicle. We report it as a separate method.
+
+\subsection{Detection and Attribution}
+The feature vector (21 passive, 21 polling features) is classified by
+gradient-boosted decision trees (LightGBM~\cite{lightgbm}; 400 trees,
+learning rate 0.05, 31 leaves, class-balanced weights). The same features
+feed a binary detector (wear versus everything else, including
+confounders) and a five-way attribution classifier (healthy, DLC wear,
+ECU-side, bus EMI, overflow/random loss). The model is deliberately
+small: inference costs microseconds per window and the feature extraction
+is a single pass over the window, so ECTA runs on the tool itself.
+
+\subsection{Health Index and Remaining Useful Life}
+Because the fault is persistent, evidence accumulates across trips. For
+prognosis, a gradient-boosted regressor maps per-trip features to an
+estimate $h_k$ of $\log_{10}R$ (the health index). Rather than extrapolating
+$h_k$ in calendar time, ECTA fits the wear law (\ref{eq:wear}) in the
+\emph{exposure} domain, where the degradation is physically stationary.
+The exposure $N_k$ of each trip is computed from the trip's own telemetry
+via (\ref{eq:exposure}). With $R_0$, $R_{\max}$ and $w/N_{50}$ fixed at
+population values, the unit-specific mid-life is
+\begin{equation}
+\hat N_{50}=\arg\min_{N_{50}}\sum_{i\le k}\big(h_i-\log_{10}R(N_i;N_{50})\big)^2,
+\label{eq:fit}
+\end{equation}
+the failure exposure $\hat N_f$ solves $R(\hat N_f)=R_{\mathrm{fail}}$, and
+the RUL in days is $(\hat N_f-N_k)/\dot N_k$, where $\dot N_k$ is the
+vehicle's mean exposure per calendar day so far. The usage rate thus
+enters explicitly: a heavily used vehicle wears its connector faster, and
+the estimator knows it.
