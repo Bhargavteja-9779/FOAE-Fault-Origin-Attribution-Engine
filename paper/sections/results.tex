@@ -46,8 +46,9 @@ true-positive rate of 55\% at a 1\% false-positive rate; no non-ECTA method
 exceeds 0.653 AUROC or 29\% TPR@1\%. The end-to-end 1D-CNN and the LSTM
 autoencoder, trained on the same windows, reach only 0.646 and 0.631: with
 six vehicles whose buses differ in rate (1\,446--2\,570 frames/s), identifier
-sets (27--98) and timing, raw sequence models overfit vehicle-specific
-patterns that the self-referenced ECTA features normalize away.
+sets (27--98) and timing, we attribute this gap to raw sequence models
+learning vehicle-specific patterns that the self-referenced ECTA features
+normalize away.
 
 \emph{(ii) ECTA is the only method that is strong on both questions.}
 Single-statistic rules and novelty detectors are good at telling wear from
@@ -75,8 +76,9 @@ predicted by first principles.
 
 \emph{(iv) Excitation coherence is what makes polling-mode detection
 work.} Removing the coherence features costs 0.037 AUROC on the polling
-corpus and 0.071 on VED (95\% CI of the gain over the strongest alternative:
-$+0.017$ to $+0.019$). On full-bus captures it changes nothing (0.880 vs.\
+corpus and 0.071 on VED; on VED even ECTA's margin over its strongest
+ablation (loss and coherence features only) has a 95\% CI of $+0.017$ to
+$+0.019$. On full-bus captures it changes nothing (0.880 vs.\
 0.878): when every frame is visible, the loss-structure features already
 separate wear from its look-alikes. The training-free $z_\beta$ test alone is
 not a detector: coherence is a \emph{discriminating} feature, informative in
@@ -100,8 +102,8 @@ Held-out vehicle & Windows & All & Moderate & Severe\\
 \end{table}
 
 Table~\ref{tab:pervehicle} breaks the full-bus result down by held-out
-vehicle. Performance is uniform across three manufacturers, model years
-2011--2017 and an undisclosed vehicle: 0.869--0.921 overall, 0.863--0.982
+vehicle. Performance is uniform across three named manufacturers (model
+years 2011--2017 where known) and an undisclosed vehicle: 0.869--0.921 overall, 0.863--0.982
 for moderate and 0.978--1.000 for severe wear. No vehicle is an outlier,
 which is the behaviour expected of features that measure the physics of the
 link rather than the idiosyncrasies of a bus.

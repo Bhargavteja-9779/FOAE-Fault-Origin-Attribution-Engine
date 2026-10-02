@@ -49,10 +49,14 @@ retained: they are the real background irregularity of healthy
 installations and constitute the false-alarm floor.
 
 \emph{Excitation decoding.} For passive captures, engine and vehicle speed
-were located by searching every 16-bit field for smooth, wide-range signals
-and checking scaled values against physical ranges; the GM layout agrees
-with public opendbc definitions and the VW layout with the PQ-platform
-\texttt{Motor\_1}/\texttt{Bremse\_1} messages. The CAN-MIRGU vehicle is
+are taken from public opendbc definitions where available (all GM
+vehicles: \texttt{0x0C9}/\texttt{0x3E9}; Subaru Forester:
+\texttt{0x140}/\texttt{0x0D1}, from the mapping shipped with
+can-train-and-test; KIA Soul: \texttt{EMS11}, \texttt{0x316}). For the
+Ford Fiesta and VW Gol they were located by searching every 16-bit field
+for smooth, wide-range signals and checking scaled values against physical
+ranges; the VW result agrees with the PQ-platform
+\texttt{Motor\_1}/\texttt{Bremse\_1} layouts. The CAN-MIRGU vehicle is
 undisclosed; ECTA then runs without coherence features, which tests its
 graceful degradation.
 
@@ -100,3 +104,8 @@ between windows of the same vehicle.
 \end{itemize}
 Deep models are trained with Adam (learning rate $10^{-3}$, 15 epochs) on
 at most 40\,000 training windows per fold.
+
+\emph{Implementation.} All methods are implemented in Python with
+LightGBM~4.7.0, scikit-learn~1.9.1~\cite{sklearn} and PyTorch~2.14.1, and run on a
+four-core CPU; no GPU is required. Hyperparameters were fixed before the
+held-out evaluations and are identical across corpora.

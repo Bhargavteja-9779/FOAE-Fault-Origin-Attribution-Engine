@@ -57,7 +57,7 @@ On its own, $z_\beta$ is a training-free test: it needs no labels and no
 healthy data from the target vehicle. We report it as a separate method.
 
 \subsection{Detection and Attribution}
-The feature vector (21 passive, 21 polling features) is classified by
+The feature vector (25 passive, 20 polling features) is classified by
 gradient-boosted decision trees (LightGBM~\cite{lightgbm}; 400 trees,
 learning rate 0.05, 31 leaves, class-balanced weights). The same features
 feed a binary detector (wear versus everything else, including

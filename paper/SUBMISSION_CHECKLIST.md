@@ -1,53 +1,51 @@
 # IEEE Access submission checklist: ECTA / OBD-II connector wear
 
-Build: `cd paper && pdflatex main && bibtex main && pdflatex main && pdflatex main`
-(13 pages, IEEE Access template `ieeeaccess.cls`).
+Build the paper: `cd paper && pdflatex main && bibtex main && pdflatex main && pdflatex main`
+(13 pages, official IEEE Access class `ieeeaccess.cls`).
+Cover letter: `pdflatex cover_letter` (2 pages).
 
-## Must do before submission
+## Already done
 
-1. **Verify every reference** in `refs.bib` against IEEE Xplore / the publisher.
-   They were written from memory of the published record, so check authors,
-   volume, pages, year and DOI for each one.
-2. **Author block**: confirm department, affiliation and IEEE membership, and
-   add e-mail addresses. Name the corresponding author (`\corresp`).
-3. **Biographies and photos** for all four authors (end of `main.tex`).
-4. **Funding / acknowledgment** paragraph (`\tfootnote` if funded).
-5. **Code availability**: put the repository URL into the "Data and Code
-   Availability" section (the repo must be public, or the link must work for
-   reviewers).
-6. **Patent**: Indian application 202641074361 is cited as related work.
-   Confirm with your patent agent that publishing now is fine (the
-   application is filed, so it normally is) and that nothing in the paper
-   discloses material you intend to file separately.
-7. Run IEEE's PDF eXpress check, and keep the similarity report low (all
-   text is original).
+- [x] Abstract 244 words (IEEE Access limit 150–250), 10 index terms, no citations in the abstract.
+- [x] All results reproducible from `ocwd/`. Every table body is generated from `ocwd/results/*.json`.
+- [x] References checked against publisher and indexing records (October 2026). Corrected:
+      Flowers et al. 2004 (title and authors), ROAD (author list), can-train-and-test
+      (journal version, vol. 140, 103777). DOIs added where confirmed. Three
+      directly relevant connector-fault papers added (Shen et al. 2017, 2018; Park et al. 2006).
+- [x] Affiliation (School of Computer Science and Engineering, VIT) and corresponding author (Ragavan K).
+- [x] Limitations, post-hoc choices and the related patent application disclosed in the paper.
+- [x] Cover letter with the originality, approval and competing-interest statements.
+
+## You must do before uploading (search the source for `[ADD`)
+
+1. **Corresponding author e-mail.** Replace `[ADD E-MAIL]` in `main.tex` (`\corresp`)
+   and in `cover_letter.tex`.
+2. **Biographies and photos** for all four authors (end of `main.tex`, `[ADD BIOGRAPHY]`).
+   IEEE Access requires both. Put the photo in the optional argument of
+   `\begin{IEEEbiography}[...]`; the exact syntax is in the comment above the biographies.
+3. **Funding.** If the work was funded, add a `\tfootnote{...}` after `\address`. If not, nothing is needed.
+4. **Code link.** The paper cites
+   `https://github.com/Bhargavteja-9779/FOAE-Fault-Origin-Attribution-Engine` (directory `ocwd`).
+   Push or merge the `claude/obdii-wear-detection-dataset-c3g668` branch so that the link works
+   for reviewers.
+5. **Patent.** Confirm with your patent agent that publishing is fine (application
+   202641074361 is already filed, so this is normally fine).
+6. **IEEE Author Portal (ScholarOne).** Upload `main.pdf` and the LaTeX source (`main.tex`,
+   `sections/`, `tables/`, `figures/`, `refs.bib`, `main.bbl`, `ieeeaccess.cls`, the logo PNGs),
+   run PDF eXpress if asked, and pay the article processing charge on acceptance.
 
 ## What the paper claims, and what it must not claim
 
-The paper is written to survive a hostile reviewer. Keep it that way:
-
-- Healthy telemetry, excitation signals and usage histories are **real**
-  (HCRL Car-Hacking, CAN-MIRGU, CANmodes, VED). The **connector faults are
-  modelled** with a physics-informed injector. The paper says this
-  everywhere. Do not rephrase it as "real worn-connector data".
-- Incipient wear is **not** detectable per window (AUROC 0.50), and moderate
-  wear only with full-bus capture. These negative results are a strength:
-  they show the evaluation is not rigged.
-- The 20-ohm failure threshold in the prognosis study was chosen **after**
-  the 6-ohm analysis. The paper discloses this.
-- Long-horizon RUL is **not** improved by telemetry for polling tools; only
-  the short-horizon alarm is. Don't oversell it.
+- Healthy telemetry, excitation and usage histories are **real**. The connector **faults are
+  modelled** on top of them. Never describe this as "real worn-connector data".
+- Incipient wear is not detectable per window; moderate wear only with full-bus capture;
+  months-ahead RUL is not achieved for polling tools. These are stated, and they are strengths.
 
 ## Likely reviewer requests, and how to answer them
 
 | Request | Answer / action |
 |---|---|
-| "Validate on real worn connectors" | Strongest possible upgrade. Use the bench protocol in `docs/bench_setup.md` (vibration rig, fretted J1962 receptacles, four-wire dry-circuit resistance). Even 2–3 naturally worn specimens logged with a full-bus tool would turn this into a much stronger paper. |
-| "Why these parameter values?" | Table I plus the robustness study (Fig. 9). Bench-measure interruption durations and the tool's hold-up time first: those are the sensitive constants. |
-| "Full-bus coverage" | Now six vehicles (can-train-and-test x4, HCRL, CAN-MIRGU), leave-one-vehicle-out. Four are GM; adding ROAD (ORNL) or CANdid (10 vehicles) would broaden manufacturer coverage; their hosts were unreachable from our build environment. |
-| "Compare with a transformer / more deep models" | Easy to add in `ocwd/models.py`; the 1D-CNN and LSTM-AE are already included. |
-
-## Reproducing the numbers
-
-See `ocwd/README.md`. Every table body in `paper/tables/` is generated by
-`python -m ocwd.experiments.figures` from `ocwd/results/*.json`.
+| "Validate on naturally worn connectors" | Strongest upgrade. Use `docs/bench_setup.md`; even 2–3 worn J1962 receptacles logged with a full-bus tool would answer it. |
+| "Why these parameter values?" | Table I plus the robustness study: full-bus results hold under every perturbation (0.84–0.95). For polling, measure the interruption-duration distribution and the tool hold-up time first. |
+| "Manufacturer coverage" | Six full-bus vehicles (three of them GM), leave-one-vehicle-out. Adding ROAD or CANdid would broaden it. |
+| "More deep baselines (Transformer)" | Add in `ocwd/models.py`; the 1D-CNN and LSTM-AE are already included and are far behind (0.646 / 0.631). |

@@ -5,7 +5,7 @@
 Across five public datasets, nine vehicles analysed in detail and a
 381-vehicle fleet, the results support five claims. First, a full-bus tool
 detects moderate and severe DLC wear on vehicles it has never seen, with
-uniform performance across six vehicles from three manufacturers, and
+uniform performance across six vehicles from at least three manufacturers, and
 confirms moderate wear within minutes of driving. Second, severe wear is
 detectable at every tool fidelity, and with near-certainty at the vehicle
 level once a handful of trips are pooled. Third, which stage a tool can see
@@ -43,20 +43,29 @@ the necessary next step; a pre-registered bench protocol for it has been
 prepared by the authors.
 
 \emph{Data coverage.} The full-bus corpus covers six vehicles and 2.68~h of
-driving (17.5 million frames); four of the six are General Motors products,
+driving (17.5 million frames); three of the six are General Motors products,
 and broader manufacturer coverage would strengthen the generalization claim.
 The sampling and polling corpora each cover three vehicles. VED provides breadth (381
 vehicles) but only through one, low-rate logger type.
 
 \emph{Post-hoc choices.} The 20-$\Omega$ failure threshold in the prognosis
 study was chosen after the pre-specified 6-$\Omega$ analysis; we report both.
-All other design choices (features, model, windows, splits) were fixed
-before the VED fleet experiments were run.
+In the observability model, the sampling-logger term ($a_{\mathrm{sig}}=0$)
+was corrected after a first comparison revealed that a frame lost on the
+wire is replaced by the next sampled frame; the correction is physical and
+is stated in Section~\ref{sec:method_obs}. All detector design choices
+(features, model, hyperparameters, windows, splits) were fixed before the
+held-out evaluations were run.
 
 \emph{Confounder coverage.} Four confounders were modelled; others exist
 (e.g., ignition-key cycling, deliberate tool sleep modes, cellular back-haul
 outages that drop already-logged data). The ECU-side confounder in
 polling mode is, as shown, not separable without multi-ECU visibility.
+
+\emph{Protocol coverage.} All data are classical CAN at 500~kbit/s. The
+physics carries over to CAN-FD, whose faster data phase shortens frames
+and therefore lowers the per-frame hit probability, and to legacy OBD-II
+transports (ISO~9141, J1850), but these were not evaluated.
 
 \section{Conclusion}
 \label{sec:conclusion}
@@ -68,7 +77,7 @@ diagnostic tool, and an evaluation on real data from five public datasets,
 nine vehicles and a 381-vehicle fleet, with strictly vehicle-disjoint
 splits, shows that (i) a full-bus tool detects wear on unseen vehicles with
 AUROC 0.880 (moderate 0.891, severe 0.995), uniformly across six vehicles
-from three manufacturers, and confirms moderate wear within two minutes of
+from at least three manufacturers, and confirms moderate wear within two minutes of
 driving; (ii) a first-principles observability law predicts which wear
 stages each tool can detect (Spearman 0.93 with measured performance);
 (iii) for low-rate polling tools, excitation coherence is what separates
@@ -80,10 +89,12 @@ validate the method on naturally worn connectors, extend it to CAN
 error-counter telemetry and CAN-FD, and investigate multi-ECU attribution.
 
 \section*{Data and Code Availability}
-All datasets used are public~\cite{cantrain,hcrl_gids,mirgu,canmodes,ved}. The
-complete code for data cleaning, fault modelling, feature extraction,
-experiments, figures and tables is available from the authors' repository,
-together with scripts that reproduce every number reported here.
+All datasets used are public~\cite{cantrain,hcrl_gids,mirgu,canmodes,ved}.
+The complete code for data cleaning, fault modelling, feature extraction,
+experiments, figures and tables, together with scripts that reproduce every
+number reported here, is available at
+\url{https://github.com/Bhargavteja-9779/FOAE-Fault-Origin-Attribution-Engine}
+(directory \texttt{ocwd}).
 
 \section*{Acknowledgment}
 The authors thank the creators of the can-train-and-test, HCRL Car-Hacking, CAN-MIRGU, CANmodes

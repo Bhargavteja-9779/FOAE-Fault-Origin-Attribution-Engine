@@ -1,7 +1,7 @@
 \section{Introduction}
 \label{sec:intro}
 
-\PARstart{T}{he} SAE~J1962 data-link connector (DLC) is the only standardized
+\PARstart{T}{he} SAE~J1962 data-link connector (DLC) is the standardized
 physical gateway into a road vehicle's electronics~\cite{j1962}. Mandated for
 emissions diagnostics, it is now also the attachment point for a large and
 growing population of \emph{permanently installed} devices: usage-based
@@ -24,8 +24,8 @@ when the supply pins open for longer than the tool's hold-up time. Field
 symptoms are therefore misattributed to tool firmware, to cellular coverage,
 to the vehicle's ECUs, or to the user, and the usual remedy---replacing the
 tool---leaves the worn receptacle in service. In fleet operations, where a
-single telematics provider may manage hundreds of thousands of installed
-units, this is a recurring and costly diagnostic blind spot.
+single provider manages large numbers of installed units, this is a
+recurring and costly diagnostic blind spot.
 
 This paper asks a simple question: \emph{can the wear of the diagnostic
 connector itself be detected, attributed and predicted from the telemetry
@@ -76,7 +76,7 @@ The contributions of this work are:
   monitoring to date}: five public real-vehicle datasets (can-train-and-test,
   HCRL Car-Hacking, CAN-MIRGU, CANmodes and the Vehicle Energy Dataset)
   covering nine vehicles in detail---six of them with complete
-  bus captures from three manufacturers---and a fleet of 381~vehicles, with
+  bus captures from at least three manufacturers---and a fleet of 381~vehicles, with
   strictly vehicle-disjoint splits and ten baseline and ablation models,
   including deep sequence models (Section~\ref{sec:results}).
 \item \textbf{Practical results}: on unseen vehicles a full-bus tool detects
@@ -90,3 +90,11 @@ The contributions of this work are:
   and DLC-versus-ECU attribution without multi-ECU visibility---with code
   and data-preparation scripts that reproduce every number in this paper.
 \end{enumerate}
+
+The remainder of the paper is organized as follows.
+Section~\ref{sec:related} reviews related work. Section~\ref{sec:model}
+presents the system and degradation model, and Section~\ref{sec:method} the
+ECTA method and the observability analysis. Section~\ref{sec:setup}
+describes the data and protocol, Section~\ref{sec:results} the results, and
+Section~\ref{sec:discussion} discusses implications and limitations before
+Section~\ref{sec:conclusion} concludes.
