@@ -1,9 +1,8 @@
 # OCWD — Predictive OBD-II Connector Wear Detection from CAN Telemetry
 
-Companion code for the paper *"Excitation-Coherent Telemetry Analysis for
-Predictive OBD-II Connector Wear Detection"* (P. N. Bhargav Teja, Lanka Sree
+Source code, results and figures for OCWD (P. N. Bhargav Teja, Lanka Sree
 Chathurya, K. Arun Reddy, Ragavan K), related to Indian Patent Application
-202641074361.
+202641074361. See the [repository README](../README.md) for headline results.
 
 The SAE J1962 diagnostic connector (DLC) carries a growing population of
 permanently installed dongles (telematics, insurance, fleet). Vibration
@@ -42,14 +41,13 @@ Set `OCWD_DATA` to use another location.
 
 * `docs/PROJECT_GUIDE.md` (also `.docx`): what the project does, code map, results, how to extend
 * `docs/GIT_GUIDE.md` (also `.docx`): how to commit, push, open a pull request, tag a release, get a DOI
-* `../paper/SUBMISSION_CHECKLIST.md`: what to upload to IEEE Access and what is still missing
 
 One-command reproduction: `bash ocwd/get_data.sh && bash ocwd/run_all.sh`.
 
-## Reproduce every number in the paper
+## Reproduce every result
 
 ```bash
-pip install numpy pandas scipy scikit-learn lightgbm torch pyarrow openpyxl matplotlib joblib pytest
+pip install -r ocwd/requirements.txt
 python -m pytest ocwd/tests -q                      # 14 unit tests, no data needed
 python -m ocwd.experiments.build                    # labelled windows, 3 seeds (~15 min)
 python -m ocwd.experiments.evaluate                 # detection + attribution tables (~40 min)
@@ -64,8 +62,7 @@ python -m ocwd.experiments.supplement               # supplementary material (La
 python -m ocwd.experiments.figures                  # all figures / LaTeX tables
 ```
 
-Results land in `ocwd/results/*.json`, figures in `ocwd/figures/`, the paper
-in `paper/` (`pdflatex main && bibtex main && pdflatex main && pdflatex main`).
+Results land in `ocwd/results/*.json`, figures in `ocwd/figures/`.
 
 ## Layout
 

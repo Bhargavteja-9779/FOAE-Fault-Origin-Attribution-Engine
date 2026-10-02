@@ -1,9 +1,7 @@
-name: ocwd-tests
+name: tests
 on:
   push:
-    paths: ["ocwd/**", ".github/workflows/ocwd-tests.yml"]
   pull_request:
-    paths: ["ocwd/**"]
 jobs:
   unit-tests:
     runs-on: ubuntu-latest
