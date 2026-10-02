@@ -1,0 +1,20 @@
+name: ocwd-tests
+on:
+  push:
+    paths: ["ocwd/**", ".github/workflows/ocwd-tests.yml"]
+  pull_request:
+    paths: ["ocwd/**"]
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies (CPU)
+        run: |
+          pip install numpy pandas scipy scikit-learn lightgbm matplotlib joblib pyarrow openpyxl pytest
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+      - name: Run OCWD unit tests (no datasets needed)
+        run: PYTHONPATH=. python -m pytest -q ocwd/tests

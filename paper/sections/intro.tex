@@ -1,0 +1,101 @@
+\section{Introduction}
+\label{sec:intro}
+
+\PARstart{T}{he} SAE~J1962 data-link connector (DLC) is the standardized
+physical gateway into a road vehicle's electronics~\cite{j1962}. Mandated for
+emissions diagnostics, it is now also the attachment point for a large and
+growing population of \emph{permanently installed} devices: usage-based
+insurance dongles, fleet telematics units, aftermarket data loggers, driver
+coaching devices and remote-diagnostics gateways. These devices remain mated
+to the DLC for months or years and draw their supply current through it. The
+J1962 receptacle, however, was designed for occasional workshop use: it is
+unsealed, mounted in the cabin under the dashboard, and its terminals are
+typically tin-plated. A permanently mated tool cantilevers from the
+receptacle and is shaken by every engine-order and road-induced vibration,
+which is precisely the regime in which \emph{fretting corrosion} turns a
+milliohm contact into an intermittent, ohmic one~\cite{antler1985,bryant1994,
+park2008,braunovic}.
+
+A degraded DLC does not announce itself. To the vehicle it is invisible:
+the in-vehicle network keeps operating because the connector is a stub that
+no electronic control unit (ECU) depends on. To the attached tool it appears
+as unexplained data loss, as communication timeouts, and as brown-out resets
+when the supply pins open for longer than the tool's hold-up time. Field
+symptoms are therefore misattributed to tool firmware, to cellular coverage,
+to the vehicle's ECUs, or to the user, and the usual remedy---replacing the
+tool---leaves the worn receptacle in service. In fleet operations, where a
+single provider manages large numbers of installed units, this is a
+recurring and costly diagnostic blind spot.
+
+This paper asks a simple question: \emph{can the wear of the diagnostic
+connector itself be detected, attributed and predicted from the telemetry
+that the attached tool already records, without any added sensor?} We
+answer it with a physics-informed method and an evaluation on real
+in-vehicle data at a scale not previously attempted for this problem.
+
+The key observation is physical. A fretted contact interrupts more often
+when it is shaken harder. Its interruption rate is therefore modulated by
+the vehicle's own mechanical excitation---engine speed and road speed---and
+these excitation signals are themselves available in the same telemetry
+stream (as OBD-II parameters, or as broadcast signals on the bus). Most
+competing causes of data loss (logger buffer overflow, ECU busy states,
+software scheduling) are \emph{not} excitation-coherent, and those that can
+be (e.g., ignition-coupled interference) leave a different footprint: they
+corrupt frames for every node on the bus, which then retransmits, whereas a
+DLC interruption destroys frames for the tool alone. We call the resulting
+approach \emph{excitation-coherent telemetry analysis} (ECTA).
+
+Validating such a method is difficult because no public dataset contains
+naturally worn diagnostic connectors, and growing worn specimens takes
+weeks to months on a vibration rig. We therefore adopt a transparent
+\emph{real-data-plus-physics} protocol: every healthy observation in this
+study is real telemetry recorded on real vehicles, and every fault
+observation is the same real telemetry passed through a physical model of
+the degraded link whose structure is taken from the electrical-contact
+literature and whose unmeasured constants are stress-tested by deliberate
+mis-specification. The detector never sees the physical model's latent
+variables; it only sees what a tool would record.
+
+The contributions of this work are:
+\begin{enumerate}
+\item A \textbf{physics-informed generative model} of DLC degradation that
+  links fretting wear to its observable effects on three classes of
+  diagnostic tool---full-bus passive loggers, low-cost sampling loggers, and
+  OBD-II polling testers---including brown-out resets, timeout dynamics and
+  four realistic confounders (Section~\ref{sec:model}).
+\item \textbf{ECTA}, a detection and fault-origin attribution method built on
+  self-referenced loss features, loss-structure features and a Poisson
+  excitation-coherence statistic, with a health index and a Bayesian,
+  censoring-aware remaining-useful-life (RUL) estimator that operates in the
+  vehicle's \emph{exposure} domain (Section~\ref{sec:method}).
+\item A first-principles \textbf{observability law} that predicts, without
+  any classifier, which wear stages each class of tool can detect, and that
+  rank-orders the measured detection performance of all tools and stages
+  (Spearman $\rho=0.93$).
+\item To our knowledge, the \textbf{first evaluation of diagnostic-connector
+  health monitoring on real in-vehicle data}, and a broad one: five public real-vehicle datasets (can-train-and-test,
+  HCRL Car-Hacking, CAN-MIRGU, CANmodes and the Vehicle Energy Dataset)
+  covering nine vehicles in detail---six of them with complete
+  bus captures from at least three manufacturers---and a fleet of 381~vehicles, with
+  strictly vehicle-disjoint splits, eleven baseline and ablation models
+  including deep sequence models, and a test against a structurally
+  different fault process (Section~\ref{sec:results}).
+\item \textbf{Practical results}: on unseen vehicles a full-bus tool detects
+  moderate wear (1.5--6\,$\Omega$) and confirms it within two minutes of
+  driving; for low-rate polling tools, excitation coherence is what separates
+  wear from its look-alikes, and a fleet-scale study in which each VED
+  vehicle's connector wears with its own recorded year of usage yields early
+  warnings with a 1.5\% false-alarm rate.
+\item An honest account of \textbf{where telemetry-only monitoring cannot
+  reach}---incipient wear, moderate wear for low-rate tools, months-ahead RUL,
+  and DLC-versus-ECU attribution without multi-ECU visibility---with code
+  and data-preparation scripts that reproduce every number in this paper.
+\end{enumerate}
+
+The remainder of the paper is organized as follows.
+Section~\ref{sec:related} reviews related work. Section~\ref{sec:model}
+presents the system and degradation model, and Section~\ref{sec:method} the
+ECTA method and the observability analysis. Section~\ref{sec:setup}
+describes the data and protocol, Section~\ref{sec:results} the results, and
+Section~\ref{sec:discussion} discusses implications and limitations before
+Section~\ref{sec:conclusion} concludes.

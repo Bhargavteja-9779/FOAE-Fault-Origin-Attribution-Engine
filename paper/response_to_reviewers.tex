@@ -1,0 +1,76 @@
+% Response-to-reviewers template for the revision round.
+% Pre-filled with answers to the questions reviewers are most likely to raise;
+% replace "Comment R?.?" with the reviewers' actual wording and keep only what applies.
+\documentclass[11pt]{article}
+\usepackage[margin=2.2cm]{geometry}
+\usepackage{mathptmx}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\newcommand{\rc}[1]{\par\medskip\noindent\textbf{Comment #1.}\ }
+\newcommand{\resp}{\par\noindent\textcolor{blue!60!black}{\textbf{Response.}}\ }
+\newcommand{\chg}{\par\noindent\textit{Changes in the manuscript:}\ }
+\begin{document}
+\begin{center}
+{\large\bfseries Response to the Reviewers}\\[2pt]
+Manuscript ID: [ACCESS-2026-XXXXX] --- ``Excitation-Coherent Telemetry Analysis for Predictive
+OBD-II Connector Wear Detection: A Physics-Informed Study on Real In-Vehicle Network Data''
+\end{center}
+
+We thank the Editor and the Reviewers for their careful reading and constructive comments. Below,
+each comment is reproduced in bold, followed by our response and the corresponding changes.
+Changes in the revised manuscript are highlighted in blue.
+
+\section*{Reviewer 1}
+
+\rc{R1.1 (realism of the faults)} \emph{The faults are simulated; the detector may only learn the simulator.}
+\resp We agree that this is the central question and address it in four ways. (i) All healthy
+telemetry, the excitation that drives the faults and the usage histories are real; only the
+connector fault is modelled, and the detector never sees model internals. (ii) Sixteen parameter
+perturbations (Section~VI-H, Fig.~9; Supplement S6): on full-bus data the AUROC stays within
+0.84--0.95 and severe-stage AUROC $\ge 0.97$. (iii) A \emph{structurally different} fault process
+(bursty Markov chatter with an energy-based brown-out criterion; Section~VI-I, Supplement S8):
+trained only on the nominal model, ECTA reaches 0.856 on full-bus data (moderate 0.848, severe
+0.999), 0.779 on the polling corpus and 0.813 on VED. (iv) The analytical observability law
+(Section~VI-C), which involves no classifier, predicts the measured detectability (Spearman 0.93).
+\chg [Section/page references.]
+
+\rc{R1.2 (stronger deep baselines)} \emph{Compare with a Transformer.}
+\resp A Transformer encoder baseline is now reported for all four corpora (Section~VI-I,
+Supplement S10). On unseen vehicles it reaches 0.641 (full-bus), 0.665 (sampling), 0.665 (polling)
+and 0.590 (VED), against 0.880, 0.675, 0.723 and 0.775 for ECTA.
+
+\rc{R1.3 (statistical significance)}
+\resp Paired vehicle-level bootstrap confidence intervals and p-values for ECTA against every
+baseline are given in Supplement S11. On the full-bus corpus (six vehicles) and VED (381 vehicles)
+ECTA's advantage over every non-ECTA baseline is significant at $p\le0.001$ (the resolution of
+1\,000 resamples); the three-vehicle corpora support no formal test and are reported as indicative.
+
+\rc{R1.4 (hyperparameters)}
+\resp Hyperparameters were fixed before evaluation and are identical across corpora. Across seven
+gradient-boosting configurations (Supplement S9) the overall AUROC varies by at most 0.004
+(full-bus), 0.007 (polling) and 0.015 (VED).
+
+\section*{Reviewer 2}
+
+\rc{R2.1 (practical false-alarm rate)}
+\resp Supplement S12 reports false alarms per hour of real healthy driving at fixed detection
+rates. A full-bus tool detecting 90\% of severely worn connectors raises no false alarm in the
+held-out healthy data (0.39 per hour at 95\% detection); low-rate polling tools need multi-trip
+pooling (Fig.~7), after which severe wear is detected per vehicle with AUROC 0.999.
+
+\rc{R2.2 (window length)}
+\resp Supplement S13 reports 10-, 30- and 60-s windows (AUROC 0.824, 0.879, 0.911). Detection
+improves with window length as the physics predicts; the 30-s window is a latency compromise, not
+the most favourable choice.
+
+\rc{R2.3 (validation on naturally worn connectors)}
+\resp We agree that this is the most valuable next step and state it as the primary limitation.
+[If bench data have been collected: describe specimens, protocol and results here.]
+
+\section*{Reviewer 3}
+
+\rc{R3.1 [comment]}
+\resp [response]
+\chg [changes]
+
+\end{document}

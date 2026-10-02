@@ -1,5 +1,13 @@
 # FOAE — Fault-Origin Attribution Engine
 
+> **New (2026-10): `ocwd/` — Predictive OBD-II Connector Wear Detection.**
+> A complete, reproducible study for Indian Patent Application 202641074361,
+> evaluated on five public real-vehicle datasets (can-train-and-test,
+> HCRL Car-Hacking, CAN-MIRGU, CANmodes, and the 381-vehicle VED fleet), with an IEEE Access
+> manuscript in `paper/` (`paper/main.pdf`). Start with `ocwd/README.md`
+> and `paper/SUBMISSION_CHECKLIST.md`. It is independent of the FOAE code
+> below and does not change its tests.
+
 Vehicle-diagnostics research backing an Indian patent filing. FOAE attributes a
 diagnostic trouble code to its true origin — degraded component, biased sensor,
 or electrical harness defect — and gates the DTC accordingly.
