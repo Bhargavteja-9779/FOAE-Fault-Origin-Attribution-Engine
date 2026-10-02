@@ -14,3 +14,5 @@ paper/*.fdb_latexmk
 paper/word/render/
 paper/word/*_flat.tex
 paper/*.toc
+paper/figures/*.aux
+paper/figures/*.log
