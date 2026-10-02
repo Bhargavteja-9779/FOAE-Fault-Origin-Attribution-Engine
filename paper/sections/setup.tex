@@ -2,7 +2,7 @@
 \label{sec:setup}
 
 \subsection{Real-Vehicle Data}
-Table~\ref{tab:data} summarizes the four public datasets. All are
+Table~\ref{tab:data} summarizes the five public datasets. All are
 recordings made on real vehicles in real operation; none was produced for
 this study, so the healthy behaviour against which ECTA is scored is
 independent of our assumptions.
@@ -17,11 +17,16 @@ independent of our assumptions.
 \toprule
 Corpus & Source & Vehicle(s) & Sessions & Hours & Frames / records & Windows & Excitation signals\\
 \midrule
-Full-bus passive & HCRL Car-Hacking~\cite{hcrl_gids} & KIA Soul & 2 & 0.27 & 1\,879\,939 & \multirow{2}{*}{777} & 0x316 (EMS11)\\
+Full-bus passive & can-train-and-test~\cite{cantrain} & Chevrolet Impala 2011 & 4 & 1.03 & 5\,362\,001 & \multirow{6}{*}{6\,468} & 0x0C9/0x3E9\\
+                 & can-train-and-test~\cite{cantrain} & Chevrolet Traverse 2011 & 4 & 0.33 & 2\,407\,121 & & 0x0C9/0x3E9\\
+                 & can-train-and-test~\cite{cantrain} & Chevrolet Silverado 2016 & 4 & 0.49 & 4\,568\,357 & & 0x0C9/0x3E9\\
+                 & can-train-and-test~\cite{cantrain} & Subaru Forester 2017 & 4 & 0.50 & 2\,873\,382 & & 0x140/0x0D1\\
+                 & HCRL Car-Hacking~\cite{hcrl_gids} & KIA Soul & 2 & 0.27 & 1\,879\,939 & & 0x316 (EMS11)\\
                  & CAN-MIRGU~\cite{mirgu} & undisclosed & 1 & 0.05 & 368\,296 & & none decodable\\
+\midrule
 Sampling passive & CANmodes RAW~\cite{canmodes} & GM Cruze, Ford Fiesta, VW Gol & 63 & 10.65 & 2\,486\,941 & 12\,684 & 0x0C9/0x3E9, 0x201, 0x280/0x1A0\\
 OBD-II polling   & CANmodes OBD~\cite{canmodes} & GM Cruze, Ford Fiesta, VW Gol & 62 & 9.03 & 154\,185 & 8\,631 & PIDs 0x0C, 0x0D\\
-Fleet polling    & VED~\cite{ved} & 381 vehicles (ICE, HEV, PHEV, EV) & 11\,277 trips & 1\,283 & 9.0\,M & 236\,817 & engine and vehicle speed\\
+Fleet polling    & VED~\cite{ved} & 381 vehicles (ICE, HEV, PHEV, EV) & 11\,277 trips & 1\,283 & 8.24\,M & 236\,817 & engine and vehicle speed\\
 \bottomrule
 \multicolumn{8}{@{}l}{\scriptsize Windows include the real (healthy) window and one copy per fault condition and confounder, for three independent injection seeds.}
 \end{tabular}}
@@ -36,7 +41,10 @@ $\{t,t+1,t-1\}$~s that continues the sequence, drop rows with corrupted
 identifiers, and split files into sessions at gaps above 5~s (files
 concatenate recordings made on different days). The four HCRL attack
 captures embed an identical 482~s benign block, which we keep once; their
-attack segments are excluded entirely. All gaps shorter than 5~s are
+attack segments are excluded entirely. From can-train-and-test we use only
+the sixteen attack-free drives (four per vehicle); its engine- and
+vehicle-speed layouts are taken from the opendbc mapping distributed with
+the dataset. All gaps shorter than 5~s are
 retained: they are the real background irregularity of healthy
 installations and constitute the false-alarm floor.
 
@@ -57,10 +65,10 @@ detector cannot exploit differences in driving between classes. The whole
 procedure is repeated with three independent random seeds.
 
 \subsection{Protocol}
-Splits are disjoint in the real data. The sampling-passive and polling
-corpora use leave-one-vehicle-out cross-validation (three folds); the
-full-bus corpus uses leave-one-capture-out (HCRL drive, HCRL idle,
-CAN-MIRGU); VED uses five-fold cross-validation grouped by vehicle
+Splits are disjoint in the real data. The full-bus corpus uses
+leave-one-vehicle-out cross-validation over its six vehicles (six folds),
+the sampling-passive and polling corpora leave-one-vehicle-out over three
+vehicles; VED uses five-fold cross-validation grouped by vehicle
 (76--77 test vehicles per fold). All seeds of a real window stay in the
 same fold. Metrics are computed on pooled out-of-fold scores. We report the
 area under the ROC curve (AUROC) for wear versus \emph{all} other windows
@@ -68,7 +76,7 @@ area under the ROC curve (AUROC) for wear versus \emph{all} other windows
 (AUPRC), the true-positive rate at 1\% false-positive rate (TPR@1\%), the
 per-stage AUROC, and macro-F1 for five-way attribution. Confidence
 intervals are 95\% percentile intervals from 500 bootstrap resamples of
-vehicles (or captures)~\cite{efron1993}, which respects the dependence
+vehicles~\cite{efron1993}, which respects the dependence
 between windows of the same vehicle.
 
 \subsection{Baselines}

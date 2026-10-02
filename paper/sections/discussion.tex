@@ -2,19 +2,22 @@
 \label{sec:discussion}
 
 \subsection{What the Evidence Supports}
-Across four public datasets, five vehicles analysed in detail and a
-381-vehicle fleet, the results support four claims. First, severe DLC wear
-is detectable from telemetry alone at every tool fidelity, and with
-near-certainty at the vehicle level once a handful of trips are pooled.
-Second, a full-bus logger detects wear one stage earlier (moderate,
-1.5--6\,$\Omega$) than sampling or polling tools, so the choice of tool,
-rather than the choice of algorithm, sets the earliest point at which wear
-can be seen. Third, excitation coherence is the feature family that makes
-polling-mode detection specific: it separates wear from bus-wide
-interference and from vibration-independent loss, which loss-counting
-rules and generic anomaly detectors cannot. Fourth, a health index learned
-from telemetry supports a short-horizon early warning with a low
-false-alarm rate, but not long-horizon RUL estimation for polling tools.
+Across five public datasets, nine vehicles analysed in detail and a
+381-vehicle fleet, the results support five claims. First, a full-bus tool
+detects moderate and severe DLC wear on vehicles it has never seen, with
+uniform performance across six vehicles from three manufacturers, and
+confirms moderate wear within minutes of driving. Second, severe wear is
+detectable at every tool fidelity, and with near-certainty at the vehicle
+level once a handful of trips are pooled. Third, which stage a tool can see
+is predicted by a first-principles observability law, so the choice of
+tool---its observation rate---rather than the choice of algorithm sets the
+earliest point at which wear can be detected. Fourth, excitation coherence
+is the feature family that makes polling-mode detection specific: it
+separates wear from bus-wide interference and from vibration-independent
+loss, which loss-counting rules and generic anomaly detectors cannot.
+Fifth, a health index learned from telemetry supports a short-horizon early
+warning with a low false-alarm rate, but not months-ahead RUL estimation for
+polling tools.
 
 \subsection{Practical Implications}
 For telematics and fleet operators the findings translate into concrete
@@ -39,10 +42,10 @@ Validation on connectors worn on a vibration rig and on field returns is
 the necessary next step; a pre-registered bench protocol for it has been
 prepared by the authors.
 
-\emph{Data coverage.} The full-bus corpus is small (two vehicles, 0.32~h),
-and its excitation variation is limited; the full-bus numbers carry wide
-confidence intervals and should be read as indicative. The sampling and
-polling corpora each cover three vehicles. VED provides breadth (381
+\emph{Data coverage.} The full-bus corpus covers six vehicles and 2.68~h of
+driving (17.5 million frames); four of the six are General Motors products,
+and broader manufacturer coverage would strengthen the generalization claim.
+The sampling and polling corpora each cover three vehicles. VED provides breadth (381
 vehicles) but only through one, low-rate logger type.
 
 \emph{Post-hoc choices.} The 20-$\Omega$ failure threshold in the prognosis
@@ -61,27 +64,29 @@ This paper introduced excitation-coherent telemetry analysis for
 detecting, attributing and predicting the wear of the OBD-II diagnostic
 connector from the telemetry of the attached tool. A physics-informed model
 links fretting wear to the observable behaviour of three classes of
-diagnostic tool, and an evaluation on real data from four public datasets
-and a 381-vehicle fleet, with strictly disjoint splits and ten
-baselines, shows that (i) severe wear is detected at every fidelity
-(AUROC 0.85--0.98 against healthy telemetry, 0.999 at the vehicle level
-after pooling ten trips), (ii) moderate wear is detected only with full-bus
-capture (0.875), (iii) excitation coherence is what separates wear from its
-look-alikes in polling mode (AUROC against bus interference 0.947 vs.\
-0.737 without it), and (iv) telemetry supports early warnings with 88\%
-timely detection and 1.5\% false alarms, but not months-ahead RUL, for
-low-rate polling tools. Future work will validate the method on naturally
-worn connectors, extend it to CAN error-counter telemetry and CAN-FD, and
-investigate multi-ECU attribution.
+diagnostic tool, and an evaluation on real data from five public datasets,
+nine vehicles and a 381-vehicle fleet, with strictly vehicle-disjoint
+splits, shows that (i) a full-bus tool detects wear on unseen vehicles with
+AUROC 0.880 (moderate 0.891, severe 0.995), uniformly across six vehicles
+from three manufacturers, and confirms moderate wear within two minutes of
+driving; (ii) a first-principles observability law predicts which wear
+stages each tool can detect (Spearman 0.93 with measured performance);
+(iii) for low-rate polling tools, excitation coherence is what separates
+wear from its look-alikes (0.947 vs.\ 0.737 against bus interference) and
+severe wear is confirmed per vehicle with AUROC 0.999 after ten trips; and
+(iv) telemetry supports early warnings with 88\% timely detection and 1.5\%
+false alarms, but not months-ahead RUL, for low-rate tools. Future work will
+validate the method on naturally worn connectors, extend it to CAN
+error-counter telemetry and CAN-FD, and investigate multi-ECU attribution.
 
 \section*{Data and Code Availability}
-All datasets used are public~\cite{hcrl_gids,mirgu,canmodes,ved}. The
+All datasets used are public~\cite{cantrain,hcrl_gids,mirgu,canmodes,ved}. The
 complete code for data cleaning, fault modelling, feature extraction,
 experiments, figures and tables is available from the authors' repository,
 together with scripts that reproduce every number reported here.
 
 \section*{Acknowledgment}
-The authors thank the creators of the HCRL Car-Hacking, CAN-MIRGU, CANmodes
+The authors thank the creators of the can-train-and-test, HCRL Car-Hacking, CAN-MIRGU, CANmodes
 and Vehicle Energy datasets for making their recordings public. The
 method described here is related to Indian Patent Application
 202641074361~\cite{patent_in}.

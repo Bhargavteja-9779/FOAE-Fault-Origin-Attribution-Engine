@@ -16,7 +16,7 @@ attached tool already records**, with no added sensor.
 
 | | Source |
 |---|---|
-| Healthy telemetry | **Real.** Four public datasets recorded on real vehicles (below). Never modified. |
+| Healthy telemetry | **Real.** Five public datasets recorded on real vehicles (below). Never modified. |
 | Excitation (engine / road speed) | **Real.** Decoded from each capture. Drives the wear process. |
 | Usage history for prognosis | **Real.** One year of trips per VED vehicle. |
 | The connector fault itself | **Modelled.** Physics-informed fretting / intermittency / brown-out model (`physics.py`) applied to the real telemetry. No public dataset of naturally worn J1962 connectors exists. |
@@ -30,6 +30,7 @@ bench protocol of the wider project).
 
 | Corpus | Dataset | Vehicles | How to obtain |
 |---|---|---|---|
+| Full-bus passive | can-train-and-test (Lampe & Meng, Comput. Secur. 2024), attack-free drives | Chevrolet Impala, Traverse, Silverado; Subaru Forester | `git clone --depth 1 https://bitbucket.org/brooke-lampe/can-dataset data/raw/can-dataset` (keep `*/attack-free/attack-free-*.log`) |
 | Full-bus passive | HCRL Car-Hacking (Seo et al., PST 2018) | KIA Soul | `git clone https://github.com/JehadAlyateem/Car-Hacking-Dataset` → unzip to `data/raw/CHD/x/` |
 | Full-bus passive | CAN-MIRGU sample (Rajapaksha et al., VehicleSec 2024) | undisclosed | `git clone https://github.com/sampathrajapaksha/CAN-MIRGU data/raw/CAN-MIRGU` |
 | Sampling passive + OBD polling | CANmodes (Roque et al., WCNPS 2024) | GM Cruze, Ford Fiesta, VW Gol | `git clone https://github.com/Asr-roque/canmodes-datasets data/raw/canmodes-datasets` |
@@ -46,6 +47,9 @@ python -m ocwd.experiments.build                    # labelled windows, 3 seeds 
 python -m ocwd.experiments.evaluate                 # detection + attribution tables (~40 min)
 python -m ocwd.experiments.accumulate               # multi-trip evidence pooling
 python -m ocwd.experiments.prognosis                # fleet RUL study
+python -m ocwd.experiments.summarize                # stage-vs-healthy, confounders, per-vehicle
+python -m ocwd.experiments.time_to_detect           # full-bus time-to-detect
+python -m ocwd.experiments.observability            # analytical observability law
 python -m ocwd.experiments.robustness fullbus ved   # model mis-specification
 python -m ocwd.experiments.figures                  # all figures / LaTeX tables
 ```

@@ -1,7 +1,7 @@
 # IEEE Access submission checklist: ECTA / OBD-II connector wear
 
 Build: `cd paper && pdflatex main && bibtex main && pdflatex main && pdflatex main`
-(11 pages, IEEE Access template `ieeeaccess.cls`).
+(13 pages, IEEE Access template `ieeeaccess.cls`).
 
 ## Must do before submission
 
@@ -44,7 +44,7 @@ The paper is written to survive a hostile reviewer. Keep it that way:
 |---|---|
 | "Validate on real worn connectors" | Strongest possible upgrade. Use the bench protocol in `docs/bench_setup.md` (vibration rig, fretted J1962 receptacles, four-wire dry-circuit resistance). Even 2–3 naturally worn specimens logged with a full-bus tool would turn this into a much stronger paper. |
 | "Why these parameter values?" | Table I plus the robustness study (Fig. 9). Bench-measure interruption durations and the tool's hold-up time first: those are the sensitive constants. |
-| "Only two full-bus vehicles" | Acknowledged in Limitations. Adding the ROAD dataset (ORNL, 17 h benign) or can-train-and-test would strengthen it; both hosts were unreachable from our build environment. |
+| "Full-bus coverage" | Now six vehicles (can-train-and-test x4, HCRL, CAN-MIRGU), leave-one-vehicle-out. Four are GM; adding ROAD (ORNL) or CANdid (10 vehicles) would broaden manufacturer coverage; their hosts were unreachable from our build environment. |
 | "Compare with a transformer / more deep models" | Easy to add in `ocwd/models.py`; the 1D-CNN and LSTM-AE are already included. |
 
 ## Reproducing the numbers

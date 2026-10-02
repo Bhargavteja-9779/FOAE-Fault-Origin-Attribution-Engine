@@ -35,10 +35,7 @@ def folds(df, corpus):
     if corpus == "ved":
         g = df["vehicle"].to_numpy()
         return list(GroupKFold(5).split(df, groups=g))
-    if corpus == "fullbus":
-        g = df["session"].str.split("#").str[0].to_numpy()  # capture-disjoint
-    else:
-        g = df["vehicle"].to_numpy()                          # vehicle-disjoint
+    g = df["vehicle"].to_numpy()                              # vehicle-disjoint
     out = []
     for v in np.unique(g):
         te = np.flatnonzero(g == v)
@@ -137,7 +134,7 @@ def run(corpus: str, tag: str = "", deep: bool = True, deep_max: int = 40000):
             oof["LSTM autoencoder"][te] = ae.score(np.asarray(seq[te]))
         print(f"  [{corpus}] fold {k + 1}/{len(F)} done ({time.time() - t_start:.0f}s)", flush=True)
 
-    groups = df["vehicle"].to_numpy() if corpus != "fullbus" else df["session"].str.split("#").str[0].to_numpy()
+    groups = df["vehicle"].to_numpy()
     res = {"corpus": corpus, "n_windows": int(len(df)), "n_vehicles": int(df.vehicle.nunique()),
            "n_real_windows": int((df.cls == 0).sum()), "folds": len(F), "detection": {}, "attribution": {}}
     for name, s in oof.items():

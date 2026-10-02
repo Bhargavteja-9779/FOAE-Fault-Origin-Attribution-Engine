@@ -3,7 +3,8 @@
     python -m ocwd.experiments.build            # all corpora, 3 injection seeds
 
 Corpora
-  fullbus   : full-bus passive captures (HCRL KIA Soul, CAN-MIRGU), W = 30 s
+  fullbus   : full-bus passive captures (HCRL KIA Soul, CAN-MIRGU, can-train-and-test
+              Impala/Traverse/Silverado/Forester), W = 30 s
   sampler   : sampling passive logger (CANmodes RAW; GM, Ford, VW), W = 60 s
   poll      : OBD-II polling tester (CANmodes OBD; GM, Ford, VW), W = 120 s
   ved       : VED fleet trips (OBD-II logger, up to 40 trips/vehicle), W = trip
@@ -78,7 +79,7 @@ def build(corpus: str, p: ph.ContactParams = ph.ContactParams(), seeds=SEEDS, ta
     t0 = time.time()
     if corpus in ("fullbus", "sampler"):
         S = loaders.all_frame_sessions()
-        S = [s for s in S if (s.vehicle in ("KIA-Soul", "MIRGU-car")) == (corpus == "fullbus")]
+        S = [s for s in S if (s.vehicle in loaders.FULLBUS_VEHICLES) == (corpus == "fullbus")]
         W, step = (30.0, 0.1) if corpus == "fullbus" else (60.0, 0.2)
         jobs = [delayed(_passive_session)(s, W, sd, p, None, step) for sd in seeds for s in S]
     elif corpus == "poll":

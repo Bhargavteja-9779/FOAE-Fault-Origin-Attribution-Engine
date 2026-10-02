@@ -65,22 +65,28 @@ The contributions of this work are:
   four realistic confounders (Section~\ref{sec:model}).
 \item \textbf{ECTA}, a detection and fault-origin attribution method built on
   self-referenced loss features, loss-structure features and a Poisson
-  excitation-coherence statistic, together with a physics-informed health
-  index and remaining-useful-life (RUL) estimator that operates in the
+  excitation-coherence statistic, with a health index and a Bayesian,
+  censoring-aware remaining-useful-life (RUL) estimator that operates in the
   vehicle's \emph{exposure} domain (Section~\ref{sec:method}).
+\item A first-principles \textbf{observability law} that predicts, without
+  any classifier, which wear stages each class of tool can detect, and that
+  rank-orders the measured detection performance of all tools and stages
+  (Spearman $\rho=0.93$).
 \item The \textbf{largest evaluation of diagnostic-connector health
-  monitoring to date}: four public real-vehicle datasets---HCRL Car-Hacking,
-  CAN-MIRGU, CANmodes (passive and polling) and the Vehicle Energy Dataset
-  (VED)---covering five vehicles in detail and a fleet of
-  381~vehicles and 236{,}817 labelled trip windows, with strictly
-  vehicle- or capture-disjoint splits and ten baseline and ablation models, including deep
-  sequence models (Section~\ref{sec:results}).
-\item A \textbf{fleet-scale prognosis study} in which each VED vehicle's
-  connector wears according to its own recorded year of usage, and the
-  method predicts remaining life in calendar days.
-\item An honest account of \textbf{where telemetry-only monitoring works and
-  where it cannot}: detectability is governed jointly by the wear stage and
-  the fidelity of the tool, and incipient wear becomes detectable only by
-  pooling evidence across trips. Code and data-preparation scripts are
-  released to make every number in this paper reproducible.
+  monitoring to date}: five public real-vehicle datasets (can-train-and-test,
+  HCRL Car-Hacking, CAN-MIRGU, CANmodes and the Vehicle Energy Dataset)
+  covering nine vehicles in detail---six of them with complete
+  bus captures from three manufacturers---and a fleet of 381~vehicles, with
+  strictly vehicle-disjoint splits and ten baseline and ablation models,
+  including deep sequence models (Section~\ref{sec:results}).
+\item \textbf{Practical results}: on unseen vehicles a full-bus tool detects
+  moderate wear (1.5--6\,$\Omega$) and confirms it within two minutes of
+  driving; for low-rate polling tools, excitation coherence is what separates
+  wear from its look-alikes, and a fleet-scale study in which each VED
+  vehicle's connector wears with its own recorded year of usage yields early
+  warnings with a 1.5\% false-alarm rate.
+\item An honest account of \textbf{where telemetry-only monitoring cannot
+  reach}---incipient wear, moderate wear for low-rate tools, months-ahead RUL,
+  and DLC-versus-ECU attribution without multi-ECU visibility---with code
+  and data-preparation scripts that reproduce every number in this paper.
 \end{enumerate}

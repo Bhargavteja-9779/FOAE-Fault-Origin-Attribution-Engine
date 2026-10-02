@@ -50,7 +50,7 @@ def _emi_bursts(grid, rpm, rng, coupled: bool):
 
 
 def passive_instance(sess, t0: float, W: float, cls: int, stage: int, p: ph.ContactParams,
-                     rng: np.random.Generator, use_excitation: bool = True) -> dict:
+                     rng: np.random.Generator, use_excitation: bool = True, R_fixed: float = None):
     pad = 2.0
     m = (sess.t >= t0 - pad) & (sess.t < t0 + W + pad)
     t, cid, dlc, pl = sess.t[m].copy(), sess.can_id[m].copy(), sess.dlc[m].copy(), sess.payload[m]
@@ -60,11 +60,11 @@ def passive_instance(sess, t0: float, W: float, cls: int, stage: int, p: ph.Cont
     R = 0.0
     keep = np.ones(len(t), dtype=bool)
     if cls == 1:
-        R = ph.sample_R(stage, rng)
+        R = R_fixed if R_fixed else ph.sample_R(stage, rng)
         it = ph.sample_interruptions(grid, v, R, p, rng)
         keep = ph.apply_dlc_passive(t, dlc, it, sess.resolution, rng)
     elif cls == 2:
-        R = ph.sample_R(int(rng.integers(2, 4)), rng)
+        R = R_fixed if R_fixed else ph.sample_R(int(rng.integers(2, 4)), rng)
         it = ph.sample_interruptions(grid, v, R, p, rng)
         ids = np.unique(cid)
         k = max(1, int(round(len(ids) * rng.uniform(0.1, 0.3))))

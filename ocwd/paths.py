@@ -6,6 +6,7 @@ DATA = Path(os.environ.get("OCWD_DATA", Path(__file__).resolve().parent.parent /
 CANMODES = DATA / "canmodes-datasets"
 MIRGU = DATA / "CAN-MIRGU"
 HCRL = DATA / "CHD" / "x"
+CTT = DATA / "can-dataset"
 VED_DYN = DATA / "VED" / "dyn"
 VED_STATIC = DATA / "VED" / "Data"
 CACHE = DATA.parent / "cache"
