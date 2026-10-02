@@ -3,23 +3,7 @@
 
 \begin{figure}[!t]
 \centering
-\resizebox{\columnwidth}{!}{%
-\begin{tikzpicture}[font=\footnotesize, >=Stealth,
-  box/.style={draw, rounded corners=2pt, align=center, minimum height=7mm, inner sep=3pt},
-  lab/.style={align=center, font=\scriptsize}]
-\node[box, minimum width=34mm] (bus) at (0,0) {In-vehicle CAN\\(ECUs, 500\,kbit/s)};
-\node[box, minimum width=20mm, fill=black!5] (dlc) at (3.1,0) {J1962 DLC\\$R(t)$};
-\node[box, minimum width=24mm] (tool) at (6.0,0) {Diagnostic tool\\(logger / tester)};
-\node[box, minimum width=24mm] (ecta) at (6.0,-1.7) {ECTA: features,\\coherence, GBM};
-\node[box, minimum width=34mm] (exc) at (0,-1.7) {Excitation $v(t)$\\engine + road};
-\draw[->, thick] (bus) -- node[above, lab]{CAN-H/L}(dlc);
-\draw[->, thick] (dlc) -- node[above, lab]{frames,\\responses}(tool);
-\draw[->] (tool) -- node[right, lab]{telemetry}(ecta);
-\draw[->, dashed] (exc) -- node[above, lab, pos=0.55]{fretting}(dlc.south west);
-\draw[->, dotted] (bus.south) -- node[left, lab]{rpm, speed}(exc.north);
-\draw[->, dotted] (exc.east) -- node[below, lab]{observed proxy $\hat v(t)$}(ecta.west);
-\node[lab, text=black!60] at (3.1,0.75) {pins 6/14 (CAN), 16/4/5 (supply)};
-\end{tikzpicture}}
+\includegraphics[width=\columnwidth]{system.pdf}
 \caption{Problem setting. Vibration excitation $v(t)$ drives fretting of
 the DLC contacts and modulates their interruption rate. The tool observes
 only its own telemetry, from which ECTA also recovers an excitation proxy
@@ -150,6 +134,7 @@ or late data. We model four, each from its own physics:
 \centering
 \footnotesize
 \setlength{\tabcolsep}{3pt}
+\resizebox{\columnwidth}{!}{%
 \begin{tabular}{@{}llll@{}}
 \toprule
 Symbol & Meaning & Nominal & Stress test (Sec.~\ref{sec:robust})\\
@@ -164,7 +149,7 @@ $T_o$ & tester timeout & \SI{0.2}{\second} & ---\\
 $w_e, w_r$ & engine / road weights & 0.5, 0.5 & (1,0), (0,1)\\
 $\sigma_u,\tau_u$ & unobserved road input & 0.5, \SI{2}{\second} & $\sigma_u{=}0$, 1.0\\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}
 
 Table~\ref{tab:params} lists the nominal parameters. Those not fixed by a

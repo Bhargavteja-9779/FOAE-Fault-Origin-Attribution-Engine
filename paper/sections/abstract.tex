@@ -1,0 +1,32 @@
+\begin{abstract}
+The SAE J1962 diagnostic connector is increasingly used as the permanent
+mount and power source of telematics, insurance and fleet devices, yet it
+was designed for occasional workshop use. Vibration-induced fretting
+corrosion of its contacts causes intermittent data loss and device
+brown-outs that are routinely misattributed to the device or the vehicle.
+This paper asks whether connector wear can be detected, attributed and
+predicted from the telemetry the attached tool already records. We propose
+excitation-coherent telemetry analysis (ECTA): self-referenced loss and
+loss-structure features plus a Poisson test of whether losses co-vary with
+the vehicle's own measured engine and road excitation, as a fretting
+contact's interruptions must. A physics-informed model maps contact wear to
+the observable behaviour of full-bus loggers, sampling loggers and OBD-II
+polling testers, including four realistic confounders. All healthy
+telemetry, excitation and usage are real, from four public datasets
+covering five vehicles in detail and a 381-vehicle fleet (236,817 labelled
+windows), evaluated with vehicle-disjoint splits against ten baseline and ablation models.
+Severe wear is detected at every tool fidelity (AUROC 0.85--0.98 against
+healthy telemetry; 0.999 per vehicle after pooling ten trips), moderate
+wear only with full-bus capture (0.875). Excitation coherence is what
+separates wear from bus interference in polling mode (0.947 vs. 0.737) and
+raises fleet-wide detection from 0.704 to 0.775. A learned health index
+yields early warnings for 88\% of failing connectors with 1.5\% false
+alarms, but not months-ahead remaining-life estimates for low-rate tools.
+\end{abstract}
+
+\begin{keywords}
+Controller area network, electrical contacts, fault diagnosis, fretting
+corrosion, intelligent vehicles, on-board diagnostics, predictive
+maintenance, prognostics and health management, remaining useful life,
+vehicle telematics.
+\end{keywords}

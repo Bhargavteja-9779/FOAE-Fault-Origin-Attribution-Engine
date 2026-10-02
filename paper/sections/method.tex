@@ -63,24 +63,33 @@ learning rate 0.05, 31 leaves, class-balanced weights). The same features
 feed a binary detector (wear versus everything else, including
 confounders) and a five-way attribution classifier (healthy, DLC wear,
 ECU-side, bus EMI, overflow/random loss). The model is deliberately
-small: inference costs microseconds per window and the feature extraction
-is a single pass over the window, so ECTA runs on the tool itself.
+small (a 1.3-MB tree ensemble) and the feature extraction is a single pass
+over the window, so ECTA can run on the tool or at the fleet back end.
 
 \subsection{Health Index and Remaining Useful Life}
 Because the fault is persistent, evidence accumulates across trips. For
 prognosis, a gradient-boosted regressor maps per-trip features to an
-estimate $h_k$ of $\log_{10}R$ (the health index). Rather than extrapolating
-$h_k$ in calendar time, ECTA fits the wear law (\ref{eq:wear}) in the
-\emph{exposure} domain, where the degradation is physically stationary.
-The exposure $N_k$ of each trip is computed from the trip's own telemetry
-via (\ref{eq:exposure}). With $R_0$, $R_{\max}$ and $w/N_{50}$ fixed at
-population values, the unit-specific mid-life is
-\begin{equation}
-\hat N_{50}=\arg\min_{N_{50}}\sum_{i\le k}\big(h_i-\log_{10}R(N_i;N_{50})\big)^2,
-\label{eq:fit}
-\end{equation}
-the failure exposure $\hat N_f$ solves $R(\hat N_f)=R_{\mathrm{fail}}$, and
-the RUL in days is $(\hat N_f-N_k)/\dot N_k$, where $\dot N_k$ is the
-vehicle's mean exposure per calendar day so far. The usage rate thus
-enters explicitly: a heavily used vehicle wears its connector faster, and
-the estimator knows it.
+estimate $h_k$ of $\log_{10}R$ (the health index, HI). Two uses of the HI
+are evaluated.
+
+\emph{Trend alarm.} A least-squares line through the last 30 trips' HI
+values is extrapolated in calendar time to the failure level; an alarm is
+raised when the projected crossing is less than 30 days away.
+
+\emph{Bayesian exposure-domain RUL.} Here the wear law (\ref{eq:wear}) is
+fitted in the \emph{exposure} domain, where degradation is physically
+stationary; each trip's exposure $N_k$ is computed from its own telemetry
+via (\ref{eq:exposure}). With $R_0$, $R_{\max}$ and $w/N_{50}$ fixed, the
+unit-specific $\ln N_{50}$ receives a Gaussian prior estimated from the
+failure exposures of other vehicles. HI readings above a detection floor
+$h_0$ are Gaussian observations of $\log_{10}R(N_i)$ with noise $\tau$;
+readings at or below $h_0$ are treated as left-censored, contributing
+$\Phi\big((h_0-\log_{10}R(N_i))/\tau\big)$ to the likelihood, because a
+low-rate tool cannot distinguish a fresh contact from a moderately worn
+one. Survival to the current exposure truncates the posterior. The RUL in
+days is the posterior median of $(N_f-N_k)/\dot N_k$, where $N_f$ solves
+$R(N_f)=R_{\mathrm{fail}}$ and $\dot N_k$ is the vehicle's mean exposure
+per day so far, so heavily used vehicles are predicted to fail sooner.
+The floor $h_0$ (99th percentile of the HI on contacts below
+1\,$\Omega$), $\tau$ and the prior are calibrated on one half of the
+vehicles and applied to the other.

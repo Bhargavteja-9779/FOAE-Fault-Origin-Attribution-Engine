@@ -2,7 +2,7 @@
 \label{sec:setup}
 
 \subsection{Real-Vehicle Data}
-Table~\ref{tab:data} summarizes the five public datasets. All are
+Table~\ref{tab:data} summarizes the four public datasets. All are
 recordings made on real vehicles in real operation; none was produced for
 this study, so the healthy behaviour against which ECTA is scored is
 independent of our assumptions.
@@ -12,6 +12,7 @@ independent of our assumptions.
 \label{tab:data}
 \centering
 \footnotesize
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{@{}lllrrrrl@{}}
 \toprule
 Corpus & Source & Vehicle(s) & Sessions & Hours & Frames / records & Windows & Excitation signals\\
@@ -23,7 +24,7 @@ OBD-II polling   & CANmodes OBD~\cite{canmodes} & GM Cruze, Ford Fiesta, VW Gol 
 Fleet polling    & VED~\cite{ved} & 381 vehicles (ICE, HEV, PHEV, EV) & 11\,277 trips & 1\,283 & 9.0\,M & 236\,817 & engine and vehicle speed\\
 \bottomrule
 \multicolumn{8}{@{}l}{\scriptsize Windows include the real (healthy) window and one copy per fault condition and confounder, for three independent injection seeds.}
-\end{tabular}
+\end{tabular}}
 \end{table*}
 
 \emph{Cleaning.} The CANmodes logger writes timestamps as
