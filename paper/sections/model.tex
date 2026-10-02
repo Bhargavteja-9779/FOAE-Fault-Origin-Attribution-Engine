@@ -93,7 +93,10 @@ excitation's temporal structure: this is the signature ECTA exploits.
 only, every frame whose on-wire interval $[t_i-T_f(i),\,t_i]$ intersects
 it, with $T_f=1.1(47+8\,\mathrm{DLC})/\text{bitrate}$. Because the rest of
 the network received the frame, nothing is retransmitted: the frame is
-simply missing from the log. A supply interruption longer than the tool's
+simply missing from the log. We assume a listen-only tool, as passive
+loggers are; an active tool would also emit error flags that make the fault
+visible to the ECUs (e.g., as network trouble codes), an additional
+observable that we deliberately do not exploit. A supply interruption longer than the tool's
 hold-up time $T_h$ causes a brown-out and silences the tool for
 $T_r\sim\mathcal U(0.3,1.5)$~s.
 

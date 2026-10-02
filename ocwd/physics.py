@@ -61,6 +61,11 @@ class ContactParams:
     w_road: float = 0.5
     ou_sigma: float = 0.5        # unobserved road-input variability (log-normal)
     ou_tau: float = 2.0          # its correlation time (s)
+    # interruption-process structure: "poisson" (nominal) or "markov" (bursty
+    # Gilbert-Elliott chatter, used only to test cross-model generalization)
+    process: str = "poisson"
+    burst_rate: float = 100.0    # markov: interruption rate inside a chatter episode (1/s)
+    burst_tau: float = 0.1       # markov: mean chatter-episode length (s)
 
 
 STAGES = {  # contact resistance ranges (ohm) per wear stage
@@ -123,6 +128,8 @@ def interruption_rate(R: float, v: np.ndarray, p: ContactParams) -> np.ndarray:
 
 def sample_interruptions(grid: np.ndarray, v: np.ndarray, R: float, p: ContactParams,
                          rng: np.random.Generator, poll: bool = False) -> Interruptions:
+    if p.process == "markov":
+        return sample_interruptions_markov(grid, v, R, p, rng, poll)
     dt = np.diff(grid, append=grid[-1] + (grid[-1] - grid[-2] if len(grid) > 1 else 0.1))
     lam = interruption_rate(R, v, p) * dt
     n = rng.poisson(lam)
@@ -140,6 +147,59 @@ def sample_interruptions(grid: np.ndarray, v: np.ndarray, R: float, p: ContactPa
     rlen = np.where(reset, rng.uniform(lo, hi, k), 0.0)
     o = np.argsort(start)
     return Interruptions(start[o], dur[o], power[o], rlen[o])
+
+
+def sample_interruptions_markov(grid: np.ndarray, v: np.ndarray, R: float, p: ContactParams,
+                                rng: np.random.Generator, poll: bool = False) -> Interruptions:
+    """Structurally different intermittency model (cross-model test).
+
+    The contact alternates between a quiet state and *chatter episodes*
+    (a two-state Gilbert-Elliott process).  Episodes start at a
+    vibration-modulated rate, last Exp(burst_tau) seconds and contain
+    Poisson(burst_rate) interruptions with exponentially distributed
+    durations.  First-order statistics are matched to the nominal model:
+    the expected interruption rate equals lambda(t) of Eq. (4) and the mean
+    duration equals the nominal log-normal mean.  What differs is the
+    structure: interruptions are clustered in time, durations are
+    exponential rather than log-normal, and a brown-out occurs when the
+    *cumulative* open time of a supply-pin episode exceeds the hold-up time
+    (an energy criterion) instead of a single long interruption.
+    """
+    dt = np.diff(grid, append=grid[-1] + (grid[-1] - grid[-2] if len(grid) > 1 else 0.1))
+    lam = interruption_rate(R, v, p)
+    ep_rate = lam / (p.burst_rate * p.burst_tau)
+    n_ep = rng.poisson(ep_rate * dt)
+    k = int(n_ep.sum())
+    z = np.zeros(0)
+    if k == 0:
+        return Interruptions(z, z, z.astype(bool), z)
+    idx = np.repeat(np.arange(len(grid)), n_ep)
+    ep_start = grid[idx] + rng.uniform(0, 1, k) * dt[idx]
+    ep_len = rng.exponential(p.burst_tau, k)
+    ep_power = rng.uniform(size=k) < p.p_power
+    med = p.d0 * (R / p.R_th) ** p.d_gamma
+    mean_d = min(med * np.exp(p.d_sigma ** 2 / 2), p.d_cap)
+    lo, hi = (p.poll_reset_lo, p.poll_reset_hi) if poll else (p.reset_lo, p.reset_hi)
+    S, D, P, RL = [], [], [], []
+    n_in = rng.poisson(p.burst_rate * ep_len)
+    for e in range(k):
+        m = int(n_in[e])
+        if m == 0:
+            continue
+        st = np.sort(ep_start[e] + rng.uniform(0, ep_len[e], m))
+        du = np.minimum(rng.exponential(mean_d, m), p.d_cap)
+        rl = np.zeros(m)
+        if ep_power[e]:
+            c = np.cumsum(du)
+            j = np.searchsorted(c, p.holdup)
+            if j < m:
+                rl[j] = rng.uniform(lo, hi)
+        S.append(st); D.append(du); P.append(np.full(m, ep_power[e])); RL.append(rl)
+    if not S:
+        return Interruptions(z, z, z.astype(bool), z)
+    st, du, pw, rl = (np.concatenate(a) for a in (S, D, P, RL))
+    o = np.argsort(st)
+    return Interruptions(st[o], du[o], pw[o].astype(bool), rl[o])
 
 
 def frame_airtime(dlc: np.ndarray) -> np.ndarray:

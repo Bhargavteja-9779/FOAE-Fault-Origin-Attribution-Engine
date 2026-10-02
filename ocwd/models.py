@@ -141,6 +141,37 @@ class SeqCNN:
         return np.concatenate(out)
 
 
+class SeqTransformer(SeqCNN):
+    """Supervised Transformer encoder on the binned telemetry sequence
+    (temporal average pooling to at most 150 tokens, 2 layers, 4 heads)."""
+
+    def __init__(self, n_in, n_out=2, seed=0, epochs=15, d=32, max_tokens=150):
+        torch = _torch()
+        torch.manual_seed(seed)
+        nn = torch.nn
+        self.max_tokens, self.n_out, self.epochs = max_tokens, n_out, epochs
+
+        class Net(nn.Module):
+            def __init__(s):
+                super().__init__()
+                s.emb = nn.Linear(n_in, d)
+                s.pos = nn.Parameter(torch.zeros(1, max_tokens, d))
+                layer = nn.TransformerEncoderLayer(d, 4, 2 * d, dropout=0.1, batch_first=True)
+                s.enc = nn.TransformerEncoder(layer, 2)
+                s.out = nn.Linear(d, n_out)
+
+            def forward(s, x):                     # x: (n, C, T)
+                T = x.shape[-1]
+                if T > max_tokens:
+                    k = int(np.ceil(T / max_tokens))
+                    x = torch.nn.functional.avg_pool1d(x, k, k, ceil_mode=True)
+                h = s.emb(x.transpose(1, 2))
+                h = h + s.pos[:, : h.shape[1]]
+                return s.out(s.enc(h).mean(1))
+
+        self.net = Net()
+
+
 class LSTMAE:
     """LSTM encoder-decoder anomaly detector (Malhotra et al. 2016) trained on
     healthy sequences; anomaly score = reconstruction error."""
