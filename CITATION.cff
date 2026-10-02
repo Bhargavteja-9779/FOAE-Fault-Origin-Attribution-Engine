@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the accompanying article."
+title: "OCWD: Excitation-Coherent Telemetry Analysis for Predictive OBD-II Connector Wear Detection"
+authors:
+  - family-names: "Bhargav Teja"
+    given-names: "P. N."
+  - family-names: "Sree Chathurya"
+    given-names: "Lanka"
+  - family-names: "Arun Reddy"
+    given-names: "K."
+  - family-names: "K"
+    given-names: "Ragavan"
+repository-code: "https://github.com/Bhargavteja-9779/FOAE-Fault-Origin-Attribution-Engine"
+date-released: "2026-10-02"
+preferred-citation:
+  type: article
+  title: "Excitation-Coherent Telemetry Analysis for Predictive OBD-II Connector Wear Detection: A Physics-Informed Study on Real In-Vehicle Network Data"
+  authors:
+    - family-names: "Bhargav Teja"
+      given-names: "P. N."
+    - family-names: "Sree Chathurya"
+      given-names: "Lanka"
+    - family-names: "Arun Reddy"
+      given-names: "K."
+    - family-names: "K"
+      given-names: "Ragavan"
+  journal: "IEEE Access (submitted)"
+  year: 2026

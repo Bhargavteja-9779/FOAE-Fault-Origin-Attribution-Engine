@@ -1,0 +1,105 @@
+\section{Discussion}
+\label{sec:discussion}
+
+\subsection{What the Evidence Supports}
+Across five public datasets, nine vehicles analysed in detail and a
+381-vehicle fleet, the results support five claims. First, a full-bus tool
+detects moderate and severe DLC wear on vehicles it has never seen, with
+uniform performance across six vehicles from at least three manufacturers, and
+confirms moderate wear within minutes of driving. Second, severe wear is
+detectable at every tool fidelity, and with near-certainty at the vehicle
+level once a handful of trips are pooled. Third, which stage a tool can see
+is predicted by a first-principles observability law, so the choice of
+tool---its observation rate---rather than the choice of algorithm sets the
+earliest point at which wear can be detected. Fourth, excitation coherence
+is the feature family that makes polling-mode detection specific: it
+separates wear from bus-wide interference and from vibration-independent
+loss, which loss-counting rules and generic anomaly detectors cannot.
+Fifth, a health index learned from telemetry supports a short-horizon early
+warning with a low false-alarm rate, but not months-ahead RUL estimation for
+polling tools.
+
+\subsection{Practical Implications}
+For telematics and fleet operators the findings translate into concrete
+guidance: (i) log full-bus traffic, or at least CAN error counters and
+brown-out events, if early warning matters; (ii) never attribute data loss
+to a DLC from loss counts alone---check excitation coherence and, where
+possible, whether losses are spread across ECUs; (iii) pool evidence per
+vehicle across trips before acting; and (iv) treat the J1962 receptacle,
+not only the device, as a field-replaceable item when the pooled evidence
+is positive. These require no hardware change to existing devices.
+
+\subsection{Limitations and Threats to Validity}
+\emph{Fault realism.} The healthy telemetry, the excitation and the usage
+histories are real, but the connector faults are modelled. No public
+dataset of naturally worn J1962 connectors exists, and we do not claim
+measured values for the unmeasured constants of Table~\ref{tab:params}.
+We mitigated this in four ways: the model's \emph{structure} follows the
+contact literature and CAN/ISO~15765 behaviour; the detector never accesses
+model internals; Section~\ref{sec:robust} quantifies how performance
+changes when the test physics differs from the training physics; and
+Section~\ref{sec:extra} shows that a detector trained on one fault process
+retains its performance on a structurally different one.
+Validation on connectors worn on a vibration rig and on field returns is
+the necessary next step; a pre-registered bench protocol for it has been
+prepared by the authors.
+
+\emph{Data coverage.} The full-bus corpus covers six vehicles and 2.68~h of
+driving (17.5 million frames); three of the six are General Motors products,
+and broader manufacturer coverage would strengthen the generalization claim.
+The sampling and polling corpora each cover three vehicles. VED provides breadth (381
+vehicles) but only through one, low-rate logger type.
+
+\emph{Post-hoc choices.} The 20-$\Omega$ failure threshold in the prognosis
+study was chosen after the pre-specified 6-$\Omega$ analysis; we report both.
+In the observability model, the sampling-logger term ($a_{\mathrm{sig}}=0$)
+was corrected after a first comparison revealed that a frame lost on the
+wire is replaced by the next sampled frame; the correction is physical and
+is stated in Section~\ref{sec:method_obs}. All detector design choices
+(features, model, hyperparameters, windows, splits) were fixed before the
+held-out evaluations were run.
+
+\emph{Confounder coverage.} Four confounders were modelled; others exist
+(e.g., ignition-key cycling, deliberate tool sleep modes, cellular back-haul
+outages that drop already-logged data). The ECU-side confounder in
+polling mode is, as shown, not separable without multi-ECU visibility.
+
+\emph{Protocol coverage.} All data are classical CAN at 500~kbit/s. The
+physics carries over to CAN-FD, whose faster data phase shortens frames
+and therefore lowers the per-frame hit probability, and to legacy OBD-II
+transports (ISO~9141, J1850), but these were not evaluated.
+
+\section{Conclusion}
+\label{sec:conclusion}
+This paper introduced excitation-coherent telemetry analysis for
+detecting, attributing and predicting the wear of the OBD-II diagnostic
+connector from the telemetry of the attached tool. A physics-informed model
+links fretting wear to the observable behaviour of three classes of
+diagnostic tool, and an evaluation on real data from five public datasets,
+nine vehicles and a 381-vehicle fleet, with strictly vehicle-disjoint
+splits, shows that (i) a full-bus tool detects wear on unseen vehicles with
+AUROC 0.880 (moderate 0.891, severe 0.995), uniformly across six vehicles
+from at least three manufacturers, and confirms moderate wear within two minutes of
+driving; (ii) a first-principles observability law predicts which wear
+stages each tool can detect (Spearman 0.93 with measured performance);
+(iii) for low-rate polling tools, excitation coherence is what separates
+wear from its look-alikes (0.947 vs.\ 0.737 against bus interference) and
+severe wear is confirmed per vehicle with AUROC 0.999 after ten trips; and
+(iv) telemetry supports early warnings with 88\% timely detection and 1.5\%
+false alarms, but not months-ahead RUL, for low-rate tools. Future work will
+validate the method on naturally worn connectors, extend it to CAN
+error-counter telemetry and CAN-FD, and investigate multi-ECU attribution.
+
+\section*{Data and Code Availability}
+All datasets used are public~\cite{cantrain,hcrl_gids,mirgu,canmodes,ved}.
+The complete code for data cleaning, fault modelling, feature extraction,
+experiments, figures and tables, together with scripts that reproduce every
+number reported here, is available at
+\url{https://github.com/Bhargavteja-9779/FOAE-Fault-Origin-Attribution-Engine}
+(directory \texttt{ocwd}).
+
+\section*{Acknowledgment}
+The authors thank the creators of the can-train-and-test, HCRL Car-Hacking, CAN-MIRGU, CANmodes
+and Vehicle Energy datasets for making their recordings public. The
+method described here is related to Indian Patent Application
+202641074361~\cite{patent_in}.

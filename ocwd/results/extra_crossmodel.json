@@ -1,0 +1,45 @@
+{
+  "fullbus": {
+    "train_nominal_test_nominal": {
+      "auroc_all": 0.8800550437116996,
+      "s1_vs_healthy": 0.5553845505144207,
+      "s2_vs_healthy": 0.8913145836847136,
+      "s3_vs_healthy": 0.9946326671164333
+    },
+    "train_nominal_test_markov": {
+      "auroc_all": 0.8561980835722718,
+      "s1_vs_healthy": 0.5282246162927982,
+      "s2_vs_healthy": 0.8483038876707708,
+      "s3_vs_healthy": 0.999288455051442
+    }
+  },
+  "poll": {
+    "train_nominal_test_nominal": {
+      "auroc_all": 0.7232145499967441,
+      "s1_vs_healthy": 0.5001223451593743,
+      "s2_vs_healthy": 0.5280229614237819,
+      "s3_vs_healthy": 0.8905168688321761
+    },
+    "train_nominal_test_markov": {
+      "auroc_all": 0.7794666836371242,
+      "s1_vs_healthy": 0.5012875841369635,
+      "s2_vs_healthy": 0.6748391259819679,
+      "s3_vs_healthy": 0.9406201715594863
+    }
+  },
+  "ved": {
+    "train_nominal_test_nominal": {
+      "auroc_all": 0.770564748695695,
+      "s1_vs_healthy": 0.4995805559941392,
+      "s2_vs_healthy": 0.4900982835444782,
+      "s3_vs_healthy": 0.842150794779198
+    },
+    "train_nominal_test_markov": {
+      "auroc_all": 0.8132594147425993,
+      "s1_vs_healthy": 0.4985729000622325,
+      "s2_vs_healthy": 0.5768792409544502,
+      "s3_vs_healthy": 0.9502307106515853
+    }
+  },
+  "seconds": 222.45075368881226
+}

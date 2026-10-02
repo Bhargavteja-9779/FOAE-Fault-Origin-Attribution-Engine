@@ -1,0 +1,33 @@
+\begin{abstract}
+The SAE J1962 diagnostic connector has become the permanent mount and power
+source of telematics, insurance and fleet devices, yet it was designed for
+occasional workshop use. Vibration-induced fretting of its contacts causes
+intermittent data loss and device brown-outs that are routinely blamed on
+the device or the vehicle. We show that connector wear can be detected,
+attributed and, within limits, predicted from the telemetry the attached
+tool already records. The proposed excitation-coherent telemetry analysis
+(ECTA) combines self-referenced loss and loss-structure features with a
+Poisson test of whether losses co-vary with the vehicle's own engine and
+road excitation, as a fretting contact's interruptions must. A
+physics-informed model maps contact wear to the observable behaviour of
+full-bus loggers, sampling loggers and OBD-II polling testers, with four
+realistic confounders. All healthy telemetry, excitation and usage are
+real: five public datasets, nine vehicles analysed in detail and a
+381-vehicle fleet. With leave-one-vehicle-out validation on six vehicles
+from at least three manufacturers, a full-bus tool detects wear with AUROC 0.880
+(moderate 0.891, severe 0.995), uniformly across held-out vehicles
+(0.869--0.921), and confirms moderate wear within two minutes of driving
+(0.94); deep sequence baselines reach 0.646. A first-principles
+observability model predicts the detectability of every tool and wear stage
+without any classifier (Spearman 0.93). For low-rate polling tools,
+excitation coherence separates wear from bus interference (0.947 vs. 0.737)
+and lifts fleet-wide detection from 0.704 to 0.775, and a learned health
+index warns 88\% of failing connectors with 1.5\% false alarms.
+\end{abstract}
+
+\begin{keywords}
+Controller area network, electrical contacts, fault diagnosis, fretting
+corrosion, intelligent vehicles, on-board diagnostics, predictive
+maintenance, prognostics and health management, remaining useful life,
+vehicle telematics.
+\end{keywords}

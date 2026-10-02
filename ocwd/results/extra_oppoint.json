@@ -1,0 +1,142 @@
+{
+  "fullbus": {
+    "window_s": 30.0,
+    "brier": 0.14459799523912292,
+    "ece": 0.0979977707493391,
+    "s2_tpr80": {
+      "fpr_healthy": 0.11038961038961038,
+      "false_alarms_per_hour_healthy": 13.246753246753247,
+      "fpr_confounders": 0.06637806637806638
+    },
+    "s2_tpr90": {
+      "fpr_healthy": 0.525974025974026,
+      "false_alarms_per_hour_healthy": 63.11688311688312,
+      "fpr_confounders": 0.2532467532467532
+    },
+    "s2_tpr95": {
+      "fpr_healthy": 0.6655844155844156,
+      "false_alarms_per_hour_healthy": 79.87012987012987,
+      "fpr_confounders": 0.3409090909090909
+    },
+    "s3_tpr80": {
+      "fpr_healthy": 0.0,
+      "false_alarms_per_hour_healthy": 0.0,
+      "fpr_confounders": 0.0
+    },
+    "s3_tpr90": {
+      "fpr_healthy": 0.0,
+      "false_alarms_per_hour_healthy": 0.0,
+      "fpr_confounders": 0.001443001443001443
+    },
+    "s3_tpr95": {
+      "fpr_healthy": 0.003246753246753247,
+      "false_alarms_per_hour_healthy": 0.38961038961038963,
+      "fpr_confounders": 0.0036075036075036075
+    }
+  },
+  "sampler": {
+    "window_s": 60.0,
+    "brier": 0.3122598275923264,
+    "ece": 0.2757271165009621,
+    "s2_tpr80": {
+      "fpr_healthy": 0.7649006622516556,
+      "false_alarms_per_hour_healthy": 45.89403973509934,
+      "fpr_confounders": 0.7555187637969095
+    },
+    "s2_tpr90": {
+      "fpr_healthy": 0.8807947019867549,
+      "false_alarms_per_hour_healthy": 52.847682119205295,
+      "fpr_confounders": 0.8664459161147903
+    },
+    "s2_tpr95": {
+      "fpr_healthy": 0.9420529801324503,
+      "false_alarms_per_hour_healthy": 56.52317880794702,
+      "fpr_confounders": 0.9258646063281825
+    },
+    "s3_tpr80": {
+      "fpr_healthy": 0.0033112582781456954,
+      "false_alarms_per_hour_healthy": 0.19867549668874174,
+      "fpr_confounders": 0.0033112582781456954
+    },
+    "s3_tpr90": {
+      "fpr_healthy": 0.026490066225165563,
+      "false_alarms_per_hour_healthy": 1.589403973509934,
+      "fpr_confounders": 0.02612214863870493
+    },
+    "s3_tpr95": {
+      "fpr_healthy": 0.4420529801324503,
+      "false_alarms_per_hour_healthy": 26.52317880794702,
+      "fpr_confounders": 0.4302796173657101
+    }
+  },
+  "poll": {
+    "window_s": 120.0,
+    "brier": 0.2365116982900912,
+    "ece": 0.17967376826443998,
+    "s2_tpr80": {
+      "fpr_healthy": 0.7931873479318735,
+      "false_alarms_per_hour_healthy": 23.795620437956206,
+      "fpr_confounders": 0.6526088131927548
+    },
+    "s2_tpr90": {
+      "fpr_healthy": 0.8953771289537713,
+      "false_alarms_per_hour_healthy": 26.861313868613138,
+      "fpr_confounders": 0.7737226277372263
+    },
+    "s2_tpr95": {
+      "fpr_healthy": 0.9464720194647201,
+      "false_alarms_per_hour_healthy": 28.394160583941602,
+      "fpr_confounders": 0.8372533117058665
+    },
+    "s3_tpr80": {
+      "fpr_healthy": 0.012165450121654502,
+      "false_alarms_per_hour_healthy": 0.3649635036496351,
+      "fpr_confounders": 0.009732360097323601
+    },
+    "s3_tpr90": {
+      "fpr_healthy": 0.6618004866180048,
+      "false_alarms_per_hour_healthy": 19.854014598540143,
+      "fpr_confounders": 0.4179507975128413
+    },
+    "s3_tpr95": {
+      "fpr_healthy": 0.7420924574209246,
+      "false_alarms_per_hour_healthy": 22.26277372262774,
+      "fpr_confounders": 0.6009732360097324
+    }
+  },
+  "ved": {
+    "window_s": 422.3,
+    "brier": 0.18470939665461542,
+    "ece": 0.0515022685478553,
+    "s2_tpr80": {
+      "fpr_healthy": 0.8331116431675091,
+      "false_alarms_per_hour_healthy": 7.102064682460413,
+      "fpr_confounders": 0.35669455036307923
+    },
+    "s2_tpr90": {
+      "fpr_healthy": 0.922585794094174,
+      "false_alarms_per_hour_healthy": 7.86480904271614,
+      "fpr_confounders": 0.45102617914535975
+    },
+    "s2_tpr95": {
+      "fpr_healthy": 0.9620466436108894,
+      "false_alarms_per_hour_healthy": 8.201202739756576,
+      "fpr_confounders": 0.5281645039559378
+    },
+    "s3_tpr80": {
+      "fpr_healthy": 0.19659483905293962,
+      "false_alarms_per_hour_healthy": 1.675920958064368,
+      "fpr_confounders": 0.08431123328702472
+    },
+    "s3_tpr90": {
+      "fpr_healthy": 0.789128314267979,
+      "false_alarms_per_hour_healthy": 6.7271179999164685,
+      "fpr_confounders": 0.32702747972766594
+    },
+    "s3_tpr95": {
+      "fpr_healthy": 0.9318967810587923,
+      "false_alarms_per_hour_healthy": 7.944182836399839,
+      "fpr_confounders": 0.46684993053708135
+    }
+  }
+}

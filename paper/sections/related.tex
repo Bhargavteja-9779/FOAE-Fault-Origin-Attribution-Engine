@@ -1,0 +1,57 @@
+\section{Related Work}
+\label{sec:related}
+
+\subsection{Fretting Corrosion and Connector Reliability}
+The physics of electrical contacts is mature~\cite{holm,braunovic}. Under
+small-amplitude relative motion, the oxide-free metallic spots of a
+tin-plated contact are progressively replaced by an insulating debris layer;
+contact resistance stays near its initial milliohm level for an incubation
+period and then rises steeply, often by several orders of magnitude, within
+a comparatively small number of additional cycles~\cite{antler1985,
+bryant1994,park2008}. Fretting in automotive connectors has been reviewed
+by Park \emph{et al.}~\cite{park2006ijat}, and Flowers \emph{et
+al.}~\cite{flowers2004} showed that its onset exhibits a vibration
+threshold at each excitation frequency. Shen \emph{et al.} measured the
+dynamic contact resistance of connectors under vibration and characterized
+the resulting intermittent faults~\cite{shen2018tcpmt}, and showed that
+contact-resistance degradation impairs high-speed signal transmission,
+which permits on-line diagnosis by monitoring the signal that passes
+through the connector~\cite{shen2017access}. Industry
+qualification tests (e.g., USCAR-2~\cite{uscar2}) define an electrical
+discontinuity as a resistance excursion above \SI{7}{\ohm} lasting at least
+\SI{1}{\micro\second} during vibration. These works either characterize the
+connector on a test bench or diagnose it by instrumenting the link (e.g.,
+measuring resistance or signal integrity). None addresses how a degraded
+connector manifests in the \emph{application-level data} that an attached
+device already records---without added measurement hardware---which is
+the question here.
+
+\subsection{Timing and Physical-Layer Analysis of In-Vehicle Networks}
+A large literature exploits the timing and electrical characteristics of
+Controller Area Network (CAN) traffic~\cite{bosch_can,iso11898}, mostly for
+intrusion detection. Inter-arrival-time analysis of periodic
+messages~\cite{song2016}, clock-skew fingerprinting of ECUs~\cite{cho_cids}
+and voltage fingerprinting~\cite{murvay2014,cho_viden,voltageids,scission,
+ecuprint} identify senders or detect injected frames; deep learning
+detectors operate on frame sequences~\cite{kang2016,taylor2016,canet}.
+Public datasets such as HCRL Car-Hacking~\cite{hcrl_gids},
+ROAD~\cite{road}, can-train-and-test~\cite{cantrain} and
+CAN-MIRGU~\cite{mirgu} serve this community. We borrow the timing view, but
+our target is the opposite of an attack: frames that \emph{should} arrive
+but do not, and only at one observation point. To our knowledge no prior
+work uses in-vehicle network telemetry to assess the health of the
+diagnostic connector itself.
+
+\subsection{Diagnostics, Anomaly Detection and Prognostics}
+Model-based fault detection by analytical redundancy~\cite{chow1984} and
+data-driven anomaly detection for automotive systems~\cite{theissler2017}
+are established, as are general prognostics and health management (PHM)
+methods for estimating RUL~\cite{si2011,lei2018} and their evaluation
+metrics~\cite{saxena2010}. Unsupervised detectors such as Isolation
+Forest~\cite{iforest}, one-class SVM~\cite{ocsvm} and LSTM
+encoder--decoders~\cite{malhotra2016} are standard baselines and are used as
+such here. What distinguishes the present problem is that (i) the degrading
+component has no sensor of its own, (ii) its symptoms are shared with
+several benign or unrelated causes, and (iii) the stimulus that drives the
+degradation is itself measurable in the same data stream. ECTA is designed
+around these three properties.

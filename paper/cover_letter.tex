@@ -1,0 +1,71 @@
+\documentclass[11pt]{letter}
+\usepackage[margin=2.2cm]{geometry}
+\usepackage{mathptmx}
+\usepackage[hidelinks]{hyperref}
+\signature{P. N. Bhargav Teja, Lanka Sree Chathurya, K. Arun Reddy and Ragavan K\\
+School of Computer Science and Engineering, Vellore Institute of Technology, Vellore, India\\Corresponding author: Ragavan K, [ADD E-MAIL]}
+\address{School of Computer Science and Engineering\\Vellore Institute of Technology\\Vellore, Tamil Nadu 632014, India}
+\begin{document}
+\begin{letter}{The Editor-in-Chief\\IEEE Access}
+\opening{Dear Editor,}
+
+We submit our manuscript, \emph{``Excitation-Coherent Telemetry Analysis for
+Predictive OBD-II Connector Wear Detection: A Physics-Informed Study on Real
+In-Vehicle Network Data,''} for consideration as a regular article in
+\emph{IEEE Access}.
+
+The SAE~J1962 diagnostic connector now serves as the permanent mount and
+power source of telematics, insurance and fleet devices, although it was
+designed for occasional workshop use. Vibration-induced fretting of its
+contacts causes intermittent data loss and device brown-outs that are
+routinely blamed on the device or the vehicle. To our knowledge, this is
+the first study of whether the wear of the diagnostic connector itself can
+be detected, attributed and predicted from the telemetry that the attached
+device already records, without added hardware.
+
+The main contributions are:
+\begin{itemize}
+\item a physics-informed model linking contact wear to the observable
+  behaviour of three classes of diagnostic tool, with four realistic
+  confounders;
+\item ECTA, a detection and attribution method built around a test of
+  whether data losses co-vary with the vehicle's own measured engine and road
+  excitation;
+\item a first-principles observability law that predicts, without any
+  classifier, which wear stages each class of tool can detect (Spearman
+  0.93 with the measured performance);
+\item an evaluation on five public real-vehicle datasets (nine vehicles in
+  detail and a 381-vehicle fleet) with strictly vehicle-disjoint splits and
+  eleven baseline and ablation models. On unseen vehicles a full-bus tool
+  detects wear with AUROC 0.880 (moderate 0.891, severe 0.995) and confirms
+  moderate wear within two minutes of driving, whereas deep sequence
+  baselines reach 0.646.
+\end{itemize}
+
+We have taken care to report the limits of the approach as clearly as its
+successes: the connector faults are modelled on top of real telemetry (no
+public dataset of naturally worn J1962 connectors exists), the unmeasured
+constants of the model are stress-tested by deliberate mis-specification
+and by a structurally different fault process (on which a full-bus tool
+still reaches AUROC 0.856),
+and the negative findings (incipient wear, moderate wear for low-rate
+tools, and months-ahead remaining-life estimation) are reported in full.
+A Supplementary Material document reports the complete results, paired
+significance tests against every baseline, hyperparameter and window-length
+sensitivity, and false-alarm rates per hour of real driving. All code is
+available, and every reported number can be reproduced from it.
+
+The work spans intelligent transportation, vehicular electronics,
+fault diagnosis and prognostics and health management, which we believe
+fits the broad, multidisciplinary scope of \emph{IEEE Access}.
+
+We confirm that this manuscript is original, has not been published
+previously, and is not under consideration for publication elsewhere. All
+authors have approved the manuscript and agree with its submission. The
+method is related to Indian Patent Application 202641074361, filed by the
+authors, which is disclosed in the manuscript. The authors declare no other
+competing interests.
+
+\closing{Sincerely,}
+\end{letter}
+\end{document}
