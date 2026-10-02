@@ -199,7 +199,7 @@ def oppoint():
 
 
 # ---------------------------------------------------------------------------
-def transformer(deep_max=40000):
+def transformer(deep_max=10000):
     res = {}
     rng = np.random.default_rng(0)
     for c in ("fullbus", "sampler", "poll", "ved"):
@@ -210,7 +210,7 @@ def transformer(deep_max=40000):
         s = np.zeros(len(d))
         for tr, te in folds(d, c):
             sub = np.sort(tr if len(tr) <= deep_max else rng.choice(tr, deep_max, replace=False))
-            m = SeqTransformer(seq.shape[1], 5).fit(np.asarray(seq[sub]), yc[sub])
+            m = SeqTransformer(seq.shape[1], 5, epochs=8, max_tokens=60).fit(np.asarray(seq[sub]), yc[sub])
             s[te] = m.proba(np.asarray(seq[te]))[:, 1]
         r = stage_metrics(d.cls.values, d.stage.values, s)
         y = (yc == 1)

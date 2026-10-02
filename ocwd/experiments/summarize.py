@@ -20,7 +20,7 @@ from .. import paths
 from .evaluate import group_bootstrap
 
 PROP = "Proposed (GBM, all features)"
-METHODS = [PROP, "GBM w/o coherence", "GBM loss only", "1D-CNN (supervised)", "LSTM autoencoder",
+METHODS = [PROP, "GBM w/o coherence", "GBM loss only", "1D-CNN (supervised)", "Transformer (supervised)", "LSTM autoencoder",
            "Isolation Forest", "One-class SVM", "Loss-rate threshold", "U-code timeout rule",
            "Coherence test (no training)"]
 

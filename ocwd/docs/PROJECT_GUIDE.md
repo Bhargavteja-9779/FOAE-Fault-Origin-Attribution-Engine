@@ -98,9 +98,12 @@ Quick check without data: `PYTHONPATH=. python -m pytest -q ocwd/tests`.
 | Full-bus detection on unseen vehicles (6-fold LOVO), wear vs everything | AUROC **0.880** (95 % CI 0.871–0.906) |
 | … moderate / severe wear vs healthy | **0.891 / 0.995** |
 | … per held-out vehicle | 0.869–0.921 |
-| … best deep baseline (1D-CNN / LSTM-AE) | 0.646 / 0.631 |
+| … deep baselines (1D-CNN / LSTM-AE / Transformer) | 0.646 / 0.631 / 0.641 |
+| … significance vs every non-ECTA baseline (full-bus, VED) | p ≤ 0.001 (paired vehicle bootstrap) |
+| … hyperparameter sensitivity (7 configurations) | ±0.004 (full-bus), ±0.015 (VED) |
 | … trained on Poisson model, tested on Markov-chatter model | 0.856 (severe 0.999) |
 | Full-bus time to detect moderate wear | AUROC 0.94 after 2 min of driving |
+| Full-bus false alarms at 90 % severe-wear detection | 0 per hour of real healthy driving |
 | Observability law vs measured detectability | Spearman 0.93 (12 tool–stage combinations) |
 | Polling: coherence features vs bus EMI | 0.947 vs 0.737 without them (VED) |
 | VED fleet detection (381 vehicles) | 0.775 vs 0.704 without coherence |

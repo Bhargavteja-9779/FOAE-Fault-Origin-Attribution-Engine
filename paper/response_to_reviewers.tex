@@ -26,34 +26,42 @@ Changes in the revised manuscript are highlighted in blue.
 \resp We agree that this is the central question and address it in four ways. (i) All healthy
 telemetry, the excitation that drives the faults and the usage histories are real; only the
 connector fault is modelled, and the detector never sees model internals. (ii) Sixteen parameter
-perturbations (Fig.~9): on full-bus data the AUROC stays within 0.84--0.95 and severe-stage AUROC
-$\ge 0.97$. (iii) A \emph{structurally different} fault process (bursty Markov chatter with an
-energy-based brown-out criterion; Supplement S8): trained on the nominal model, ECTA reaches 0.856
-on full-bus data (severe 0.999). (iv) The analytical observability law (Section~VI-C), which
-involves no classifier, predicts the measured detectability (Spearman 0.93).
+perturbations (Section~VI-H, Fig.~9; Supplement S6): on full-bus data the AUROC stays within
+0.84--0.95 and severe-stage AUROC $\ge 0.97$. (iii) A \emph{structurally different} fault process
+(bursty Markov chatter with an energy-based brown-out criterion; Section~VI-I, Supplement S8):
+trained only on the nominal model, ECTA reaches 0.856 on full-bus data (moderate 0.848, severe
+0.999), 0.779 on the polling corpus and 0.813 on VED. (iv) The analytical observability law
+(Section~VI-C), which involves no classifier, predicts the measured detectability (Spearman 0.93).
 \chg [Section/page references.]
 
 \rc{R1.2 (stronger deep baselines)} \emph{Compare with a Transformer.}
-\resp A Transformer encoder baseline is reported in Supplement S10 for all four corpora; it does
-not close the gap to ECTA on unseen vehicles.
+\resp A Transformer encoder baseline is now reported for all four corpora (Section~VI-I,
+Supplement S10). On unseen vehicles it reaches 0.641 (full-bus), 0.665 (sampling), 0.665 (polling)
+and 0.590 (VED), against 0.880, 0.675, 0.723 and 0.775 for ECTA.
 
 \rc{R1.3 (statistical significance)}
 \resp Paired vehicle-level bootstrap confidence intervals and p-values for ECTA against every
-baseline are given in Supplement S11.
+baseline are given in Supplement S11. On the full-bus corpus (six vehicles) and VED (381 vehicles)
+ECTA's advantage over every non-ECTA baseline is significant at $p\le0.001$ (the resolution of
+1\,000 resamples); the three-vehicle corpora support no formal test and are reported as indicative.
 
 \rc{R1.4 (hyperparameters)}
-\resp Hyperparameters were fixed before evaluation and are identical across corpora. Supplement S9
-shows that seven gradient-boosting configurations change the AUROC by at most a few thousandths.
+\resp Hyperparameters were fixed before evaluation and are identical across corpora. Across seven
+gradient-boosting configurations (Supplement S9) the overall AUROC varies by at most 0.004
+(full-bus), 0.007 (polling) and 0.015 (VED).
 
 \section*{Reviewer 2}
 
 \rc{R2.1 (practical false-alarm rate)}
 \resp Supplement S12 reports false alarms per hour of real healthy driving at fixed detection
 rates. A full-bus tool detecting 90\% of severely worn connectors raises no false alarm in the
-held-out healthy data; low-rate polling tools need multi-trip pooling (Fig.~10).
+held-out healthy data (0.39 per hour at 95\% detection); low-rate polling tools need multi-trip
+pooling (Fig.~7), after which severe wear is detected per vehicle with AUROC 0.999.
 
 \rc{R2.2 (window length)}
-\resp Supplement S13 reports 10-, 30- and 60-s windows; the 30-s choice is not critical.
+\resp Supplement S13 reports 10-, 30- and 60-s windows (AUROC 0.824, 0.879, 0.911). Detection
+improves with window length as the physics predicts; the 30-s window is a latency compromise, not
+the most favourable choice.
 
 \rc{R2.3 (validation on naturally worn connectors)}
 \resp We agree that this is the most valuable next step and state it as the primary limitation.

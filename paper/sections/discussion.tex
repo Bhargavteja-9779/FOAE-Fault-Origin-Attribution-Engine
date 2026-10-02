@@ -34,10 +34,12 @@ is positive. These require no hardware change to existing devices.
 histories are real, but the connector faults are modelled. No public
 dataset of naturally worn J1962 connectors exists, and we do not claim
 measured values for the unmeasured constants of Table~\ref{tab:params}.
-We mitigated this in three ways: the model's \emph{structure} follows the
+We mitigated this in four ways: the model's \emph{structure} follows the
 contact literature and CAN/ISO~15765 behaviour; the detector never accesses
-model internals; and Section~\ref{sec:robust} quantifies how performance
-changes when the test physics differs from the training physics.
+model internals; Section~\ref{sec:robust} quantifies how performance
+changes when the test physics differs from the training physics; and
+Section~\ref{sec:extra} shows that a detector trained on one fault process
+retains its performance on a structurally different one.
 Validation on connectors worn on a vibration rig and on field returns is
 the necessary next step; a pre-registered bench protocol for it has been
 prepared by the authors.

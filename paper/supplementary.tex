@@ -387,6 +387,121 @@ VED fleet & nominal $\rightarrow$ Markov & 0.813 & 0.499 & 0.577 & 0.950 \\
 \bottomrule
 \end{tabular}}
 \end{table}
+\section{Hyperparameter sensitivity}
+\begin{table}[!htbp]
+\centering
+\caption{ECTA with different gradient-boosting settings (same folds).}\label{tab:s_hp}
+\footnotesize
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Corpus & Setting & All & Moderate & Severe \\
+\midrule
+Full-bus passive & default (400 trees, 31 leaves, lr 0.05) & 0.880 & 0.891 & 0.995 \\
+Full-bus passive & 200 trees & 0.881 & 0.891 & 0.995 \\
+Full-bus passive & 800 trees & 0.880 & 0.895 & 0.994 \\
+Full-bus passive & 15 leaves & 0.877 & 0.880 & 0.995 \\
+Full-bus passive & 63 leaves & 0.877 & 0.885 & 0.995 \\
+Full-bus passive & lr 0.1 & 0.880 & 0.887 & 0.995 \\
+Full-bus passive & lr 0.02, 1000 trees & 0.881 & 0.890 & 0.996 \\
+\midrule
+OBD-II polling & default (400 trees, 31 leaves, lr 0.05) & 0.723 & 0.528 & 0.891 \\
+OBD-II polling & 200 trees & 0.720 & 0.526 & 0.888 \\
+OBD-II polling & 800 trees & 0.727 & 0.530 & 0.894 \\
+OBD-II polling & 15 leaves & 0.721 & 0.528 & 0.890 \\
+OBD-II polling & 63 leaves & 0.723 & 0.527 & 0.893 \\
+OBD-II polling & lr 0.1 & 0.722 & 0.529 & 0.892 \\
+OBD-II polling & lr 0.02, 1000 trees & 0.723 & 0.527 & 0.890 \\
+\midrule
+VED fleet & default (400 trees, 31 leaves, lr 0.05) & 0.771 & 0.492 & 0.842 \\
+VED fleet & 200 trees & 0.762 & 0.489 & 0.835 \\
+VED fleet & 800 trees & 0.775 & 0.493 & 0.846 \\
+VED fleet & 15 leaves & 0.760 & 0.486 & 0.833 \\
+VED fleet & 63 leaves & 0.775 & 0.494 & 0.846 \\
+VED fleet & lr 0.1 & 0.773 & 0.493 & 0.846 \\
+VED fleet & lr 0.02, 1000 trees & 0.771 & 0.490 & 0.842 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+\section{Transformer baseline}
+A 2-layer, 4-head Transformer encoder ($d=32$, temporal average pooling to $\le$60 tokens) is trained end-to-end on the binned sequences with the same folds as all other methods. Because of its CPU cost it is trained on at most 10\,000 windows per fold for 8 epochs (the 1D-CNN: 40\,000 windows, 15 epochs).
+\begin{table}[!htbp]
+\centering
+\caption{Transformer baseline vs.\ ECTA and the 1D-CNN (AUROC).}\label{tab:s_tf}
+\footnotesize
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+Corpus & Transformer & 95\% CI & Moderate & Severe & ECTA & 1D-CNN \\
+\midrule
+Full-bus passive & 0.641 & [0.634, 0.645] & 0.528 & 0.907 & 0.880 & 0.646 \\
+Sampling passive & 0.665 & [0.660, 0.676] & 0.555 & 0.942 & 0.675 & 0.677 \\
+OBD-II polling & 0.665 & [0.599, 0.748] & 0.514 & 0.862 & 0.723 & 0.673 \\
+VED fleet & 0.590 & [0.588, 0.592] & 0.499 & 0.757 & 0.775 & 0.701 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+\section{Statistical significance}
+Paired bootstrap over vehicles (1\,000 resamples) of $\Delta$AUROC = ECTA $-$ baseline (wear vs.\ all); two-sided p-values, whose resolution is 0.001. The sampling and polling corpora contain only three vehicles, so their vehicle-level bootstrap is coarse and their p-values should be read as indicative; the full-bus (six vehicles) and VED (381 vehicles) tests are the informative ones.
+\begin{table}[!htbp]
+\centering
+\caption{ECTA vs.\ every baseline.}\label{tab:s_sig}
+\scriptsize
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Corpus & Baseline & $\Delta$AUROC & 95\% CI & p \\
+\midrule
+Full-bus passive & GBM w/o coherence & +0.002 & [-0.001, +0.004] & 0.298 \\
+Full-bus passive & GBM loss only & +0.112 & [+0.070, +0.136] & $\le$0.001 \\
+Full-bus passive & GBM loss+coherence & +0.068 & [+0.049, +0.088] & $\le$0.001 \\
+Full-bus passive & Isolation Forest & +0.258 & [+0.255, +0.281] & $\le$0.001 \\
+Full-bus passive & One-class SVM & +0.284 & [+0.258, +0.298] & $\le$0.001 \\
+Full-bus passive & Loss-rate threshold & +0.227 & [+0.224, +0.250] & $\le$0.001 \\
+Full-bus passive & U-code timeout rule & +0.293 & [+0.290, +0.314] & $\le$0.001 \\
+Full-bus passive & Coherence test (no training) & +0.287 & [+0.278, +0.302] & $\le$0.001 \\
+Full-bus passive & 1D-CNN (supervised) & +0.234 & [+0.223, +0.260] & $\le$0.001 \\
+Full-bus passive & LSTM autoencoder & +0.249 & [+0.237, +0.277] & $\le$0.001 \\
+Full-bus passive & Transformer (supervised) & +0.239 & [+0.235, +0.266] & $\le$0.001 \\
+\midrule
+Sampling passive & GBM w/o coherence & +0.001 & [-0.003, +0.004] & 0.494 \\
+Sampling passive & GBM loss only & +0.002 & [-0.006, +0.005] & 0.494 \\
+Sampling passive & GBM loss+coherence & +0.000 & [-0.002, +0.001] & 0.494 \\
+Sampling passive & Isolation Forest & +0.039 & [+0.024, +0.054] & $\le$0.001 \\
+Sampling passive & One-class SVM & +0.018 & [+0.009, +0.030] & $\le$0.001 \\
+Sampling passive & Loss-rate threshold & +0.009 & [+0.005, +0.016] & $\le$0.001 \\
+Sampling passive & U-code timeout rule & +0.007 & [+0.004, +0.014] & $\le$0.001 \\
+Sampling passive & Coherence test (no training) & +0.165 & [+0.155, +0.179] & $\le$0.001 \\
+Sampling passive & 1D-CNN (supervised) & -0.002 & [-0.025, +0.011] & 0.998 \\
+Sampling passive & LSTM autoencoder & +0.024 & [+0.008, +0.035] & $\le$0.001 \\
+Sampling passive & Transformer (supervised) & +0.011 & [+0.004, +0.020] & $\le$0.001 \\
+\midrule
+OBD-II polling & GBM w/o coherence & +0.037 & [+0.020, +0.044] & $\le$0.001 \\
+OBD-II polling & GBM loss only & +0.053 & [+0.024, +0.060] & $\le$0.001 \\
+OBD-II polling & GBM loss+coherence & +0.011 & [+0.001, +0.018] & $\le$0.001 \\
+OBD-II polling & Isolation Forest & +0.124 & [+0.089, +0.145] & $\le$0.001 \\
+OBD-II polling & One-class SVM & +0.120 & [+0.107, +0.162] & $\le$0.001 \\
+OBD-II polling & Loss-rate threshold & +0.144 & [+0.098, +0.216] & $\le$0.001 \\
+OBD-II polling & U-code timeout rule & +0.114 & [+0.056, +0.211] & $\le$0.001 \\
+OBD-II polling & Coherence test (no training) & +0.238 & [+0.191, +0.300] & $\le$0.001 \\
+OBD-II polling & 1D-CNN (supervised) & +0.051 & [+0.018, +0.051] & $\le$0.001 \\
+OBD-II polling & LSTM autoencoder & +0.175 & [+0.093, +0.212] & $\le$0.001 \\
+OBD-II polling & Transformer (supervised) & +0.058 & [+0.030, +0.074] & $\le$0.001 \\
+\midrule
+VED fleet & GBM w/o coherence & +0.070 & [+0.068, +0.073] & $\le$0.001 \\
+VED fleet & GBM loss only & +0.102 & [+0.100, +0.105] & $\le$0.001 \\
+VED fleet & GBM loss+coherence & +0.018 & [+0.017, +0.019] & $\le$0.001 \\
+VED fleet & Isolation Forest & +0.224 & [+0.221, +0.227] & $\le$0.001 \\
+VED fleet & One-class SVM & +0.233 & [+0.230, +0.236] & $\le$0.001 \\
+VED fleet & Loss-rate threshold & +0.208 & [+0.205, +0.211] & $\le$0.001 \\
+VED fleet & U-code timeout rule & +0.218 & [+0.214, +0.222] & $\le$0.001 \\
+VED fleet & Coherence test (no training) & +0.266 & [+0.261, +0.272] & $\le$0.001 \\
+VED fleet & 1D-CNN (supervised) & +0.073 & [+0.071, +0.076] & $\le$0.001 \\
+VED fleet & LSTM autoencoder & +0.221 & [+0.218, +0.224] & $\le$0.001 \\
+VED fleet & Transformer (supervised) & +0.185 & [+0.181, +0.189] & $\le$0.001 \\
+\bottomrule
+\end{tabular}}
+\end{table}
 \section{Operating points and calibration}
 The threshold is set to reach the stated detection rate for the given wear stage; false alarms are counted on the real healthy windows of held-out vehicles.
 \begin{table}[!htbp]
