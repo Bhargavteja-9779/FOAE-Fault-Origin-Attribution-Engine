@@ -29,7 +29,7 @@ def run():
     out = {}
     for c in ("fullbus", "sampler", "poll", "ved"):
         o = pd.read_parquet(paths.CACHE / f"oof_{c}.parquet")
-        groups = (o.session.str.split("#").str[0] if c == "fullbus" else o.vehicle).to_numpy()
+        groups = o.vehicle.to_numpy()
         res = {}
         for m in METHODS:
             if m not in o:
@@ -54,6 +54,17 @@ def run():
             "macro_f1_excl_incipient": f1_score(o.cls[keep], pred[keep], average="macro"),
             "per_class_f1_excl_incipient": f1_score(o.cls[keep], pred[keep], average=None).tolist(),
         }
+        # per held-out vehicle (each vehicle is its own test fold for LOVO corpora)
+        if c != "ved":
+            pv = {}
+            for v, g in o.groupby("vehicle"):
+                y = (g.cls == 1).to_numpy()
+                r = {"n_windows": int(len(g)), "auroc_all": roc_auc_score(y, g[PROP])}
+                for st in (2, 3):
+                    mm = ((g.cls == 0) | ((g.cls == 1) & (g.stage == st))).to_numpy()
+                    r[f"s{st}_vs_healthy"] = roc_auc_score(y[mm], g[PROP][mm])
+                pv[v] = r
+            res["per_vehicle"] = pv
         out[c] = res
         print(c, {k: round(v, 3) for k, v in res["attribution"].items() if k.startswith("macro")})
     with open(paths.RESULTS / "detection_extra.json", "w", encoding="utf-8") as fh:

@@ -54,9 +54,10 @@ def run(corpus="ved"):
         train_u = [L for L in T if L.vehicle not in test_v]
         test_u = [L for L in T if L.vehicle in test_v]
     else:
-        S = [s for s in loaders.all_frame_sessions() if s.vehicle in ("KIA-Soul", "MIRGU-car")]
-        train_u = [s for s in S if "normal_run" not in s.name]
-        test_u = [s for s in S if "normal_run" in s.name]
+        S = [s for s in loaders.all_frame_sessions() if s.vehicle in loaders.FULLBUS_VEHICLES]
+        test_v = {"GM-Impala", "Subaru-Forester", "MIRGU-car"}     # vehicle-disjoint halves
+        train_u = [s for s in S if s.vehicle not in test_v]
+        test_u = [s for s in S if s.vehicle in test_v]
     feats = feature_sets(corpus)["all"]
     dtr = _dataset(corpus, train_u, NOMINAL, 10)
     m = GBM(feats).fit(dtr, (dtr.cls == 1).astype(int).to_numpy())

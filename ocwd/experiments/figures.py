@@ -219,6 +219,48 @@ def fig_robustness():
     plt.close(fig)
 
 
+def fig_ttd():
+    with open(paths.RESULTS / "time_to_detect_fullbus.json", encoding="utf-8") as fh:
+        a = json.load(fh)
+    H = [float(h) for h in a if a[h].get("n_trajectories", 0) >= 50]
+    fig, ax = plt.subplots(figsize=(3.5, 1.95))
+    for st, col, lab in ((1, YELLOW, "incipient"), (2, ORANGE, "moderate"), (3, RED, "severe")):
+        ax.plot(H, [a[str(h) if str(h) in a else str(int(h))][f"s{st}_vs_healthy"] for h in H],
+                color=col, marker="o", ms=3.5, label=lab)
+    ax.set_xscale("log")
+    ax.set_xticks(H)
+    ax.set_xticklabels([f"{h:g}" for h in H])
+    ax.set_xlabel("Driving time observed (min)")
+    ax.set_ylabel("AUROC (wear vs. healthy)")
+    ax.set_ylim(0.45, 1.02)
+    ax.legend(frameon=False, loc="center left", bbox_to_anchor=(0.08, 0.45), ncol=3, handlelength=1.4)
+    fig.savefig(FIG / "fig_ttd.pdf")
+    plt.close(fig)
+
+
+def fig_observability():
+    with open(paths.RESULTS / "observability.json", encoding="utf-8") as fh:
+        o = json.load(fh)
+    d = pd.DataFrame(o["rows"])
+    fig, ax = plt.subplots(figsize=(3.5, 2.2))
+    mk = {"fullbus": ("o", BLUE), "sampler": ("s", AQUA), "poll": ("^", ORANGE), "ved": ("D", VIOLET)}
+    for c, g in d.groupby("corpus"):
+        m, col = mk[c]
+        ax.scatter(np.maximum(g.snr, 1e-4), g.auroc_best, marker=m, color=col, s=26,
+                   label=CORPUS_LABEL[c].replace(" (381 veh.)", ""), zorder=3)
+        for _, r in g.iterrows():
+            ax.annotate(["", "I", "M", "S"][int(r.stage)], (max(r.snr, 1e-4), r.auroc_best),
+                        textcoords="offset points", xytext=(4, -3), fontsize=6, color=INK2)
+    ax.set_xscale("log")
+    ax.axvline(1.0, color=MUTED, lw=0.8, ls=":")
+    ax.set_xlabel("Predicted observability SNR (no detector involved)")
+    ax.set_ylabel("Best measured AUROC")
+    ax.set_title(f"Spearman ρ = {o['spearman_snr_auroc_best']:.2f}  (I/M/S = incipient/moderate/severe)", fontsize=7)
+    ax.legend(frameon=False, loc="upper left", fontsize=6.5)
+    fig.savefig(FIG / "fig_observability.pdf")
+    plt.close(fig)
+
+
 def _bold_best(vals, fmt="{:.3f}"):
     best = max(v for v in vals if v is not None)
     return [("--" if v is None else (r"\textbf{" + fmt.format(v) + "}" if abs(v - best) < 5e-4 else fmt.format(v)))
@@ -266,6 +308,14 @@ def tables(corpora):
         lines.append(f"{CORPUS_LABEL[c]} & {a['macro_f1_all']:.3f} & {a['macro_f1_excl_incipient']:.3f} & "
                      + " & ".join(f"{v:.2f}" for v in pc) + f" & {cnn:.3f}" + r" \\")
     (paths.RESULTS / "table_attribution.tex").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    # Table: per held-out vehicle (full-bus)
+    pv = X["fullbus"]["per_vehicle"]
+    names = {"GM-Impala": "Chevrolet Impala (2011)", "GM-Traverse": "Chevrolet Traverse (2011)",
+             "GM-Silverado": "Chevrolet Silverado (2016)", "Subaru-Forester": "Subaru Forester (2017)",
+             "KIA-Soul": "KIA Soul", "MIRGU-car": "CAN-MIRGU vehicle"}
+    lines = [f"{names.get(v, v)} & {r['n_windows']} & {r['auroc_all']:.3f} & {r['s2_vs_healthy']:.3f} & "
+             f"{r['s3_vs_healthy']:.3f}" + r" \\" for v, r in sorted(pv.items(), key=lambda x: names.get(x[0], x[0]))]
+    (paths.RESULTS / "table_pervehicle.tex").write_text("\n".join(lines) + "\n", encoding="utf-8")
     # Table: prognosis
     lines = []
     nm = {"proposed": "Bayesian wear law + HI (proposed)", "conditional": "Conditional reliability (no HI)",
@@ -297,7 +347,7 @@ def main():
     fig_confusion("ved")
     fig_confusion("fullbus")
     fig_importance("ved")
-    for fn in (fig_accumulation, fig_prognosis, fig_robustness):
+    for fn in (fig_accumulation, fig_prognosis, fig_robustness, fig_ttd, fig_observability):
         try:
             fn()
         except FileNotFoundError as e:

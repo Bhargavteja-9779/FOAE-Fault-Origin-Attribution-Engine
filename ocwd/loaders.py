@@ -235,6 +235,8 @@ def hcrl_normal(min_dur: float = 60.0, margin: float = 1.0) -> list[FrameLog]:
                         np.asarray(dl), 1e-6, payload_matrix(pl)))
     seen = set()
     for name in ["DoS_dataset", "Fuzzy_dataset", "gear_dataset", "RPM_dataset"]:
+        if not (paths.HCRL / f"{name}.csv").exists():
+            continue
         t, ids, dl, pl, att = _hcrl_parse(paths.HCRL / f"{name}.csv")
         P = payload_matrix(pl)
         ta = t[att]
@@ -249,6 +251,36 @@ def hcrl_normal(min_dur: float = 60.0, margin: float = 1.0) -> list[FrameLog]:
                 continue
             seen.add(key)
             out.append(FrameLog(f"HCRL-{name}#c{k}", "KIA-Soul", "mixed", t[m], ids[m], dl[m], 1e-6, P[m]))
+    return out
+
+
+FULLBUS_VEHICLES = ("KIA-Soul", "MIRGU-car", "GM-Impala", "GM-Traverse", "GM-Silverado", "Subaru-Forester")
+_CTT = {"2011-chevrolet-impala": "GM-Impala", "2011-chevrolet-traverse": "GM-Traverse",
+        "2016-chevrolet-silverado": "GM-Silverado", "2017-subaru-forester": "Subaru-Forester"}
+
+
+def ctt_attack_free() -> list[FrameLog]:
+    """Attack-free full-bus captures of the can-train-and-test project
+    (Lampe & Meng, 2023): four vehicles, candump format, microsecond stamps."""
+    out = []
+    for d, veh in _CTT.items():
+        for f in sorted((paths.CTT / d / "attack-free").glob("attack-free-*.log")):
+            t, ids, dl, pl = [], [], [], []
+            with open(f, "r", encoding="utf-8", errors="ignore") as fh:
+                for line in fh:
+                    q = line.split()
+                    if len(q) < 3 or "#" not in q[2]:
+                        continue
+                    cid, data = q[2].split("#", 1)
+                    try:
+                        t.append(float(q[0].strip("()")))
+                        ids.append(int(cid, 16))
+                    except ValueError:
+                        continue
+                    dl.append(len(data) // 2)
+                    pl.append(data)
+            out.append(FrameLog(f"CTT-{veh}-{f.stem}", veh, "mixed", np.asarray(t), np.asarray(ids),
+                                np.asarray(dl), 1e-6, payload_matrix(pl)))
     return out
 
 
@@ -339,7 +371,7 @@ def all_frame_sessions(cache: bool = True) -> list[FrameLog]:
             return pickle.load(fh)
     out = []
     seen = set()
-    for L in canmodes_raw_logs() + mirgu_benign() + hcrl_normal():
+    for L in canmodes_raw_logs() + mirgu_benign() + hcrl_normal() + ctt_attack_free():
         for S in frame_sessions(L):
             # the HCRL attack files embed the same benign block; keep one copy
             key = (S.vehicle, round(float(S.t[0]), 1), round(float(S.t[-1]), 1))

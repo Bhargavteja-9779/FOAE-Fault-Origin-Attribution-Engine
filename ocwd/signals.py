@@ -22,6 +22,11 @@ DECODERS = {
     "VW-Gol": {"rpm": (0x280, 2, "le", 0.25), "speed": (0x1A0, 2, "le", 0.005)},
     # Hyundai/KIA EMS11 (0x316): engine speed bytes 2-3 LE x0.25, vehicle speed byte 6 (km/h)
     "KIA-Soul": {"rpm": (0x316, 2, "le", 0.25), "speed": (0x316, 6, "u8", 1.0)},
+    # can-train-and-test vehicles (Lampe & Meng); layouts from the opendbc sheet shipped with the data
+    "GM-Impala": {"rpm": (0x0C9, 1, "be", 0.25), "speed": (0x3E9, 0, "be", 0.01 * 1.609344)},
+    "GM-Traverse": {"rpm": (0x0C9, 1, "be", 0.25), "speed": (0x3E9, 0, "be", 0.01 * 1.609344)},
+    "GM-Silverado": {"rpm": (0x0C9, 1, "be", 0.25), "speed": (0x3E9, 0, "be", 0.01 * 1.609344)},
+    "Subaru-Forester": {"rpm": (0x140, 2, "le14", 1.0), "speed": (0x0D1, 0, "le", 0.05625)},
     "Ford-Fiesta": {"rpm": (0x201, 0, "be", 1.0), "speed": (0x201, 4, "be", 0.01)},
 }
 LIMITS = {"rpm": (0.0, 8000.0), "speed": (0.0, 250.0)}
@@ -38,7 +43,9 @@ def decode(vehicle: str, t: np.ndarray, can_id: np.ndarray, payload: np.ndarray,
     cid, off, endian, scale = DECODERS[vehicle][kind]
     m = can_id == cid
     b = payload[m]
-    if endian == "u8":
+    if endian == "le14":
+        raw = (b[:, off + 1].astype(np.float64) * 256 + b[:, off]) % 16384
+    elif endian == "u8":
         raw = b[:, off].astype(np.float64)
     elif endian == "be":
         raw = b[:, off].astype(np.float64) * 256 + b[:, off + 1]
