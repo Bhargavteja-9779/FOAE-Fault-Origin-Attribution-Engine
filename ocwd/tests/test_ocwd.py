@@ -91,3 +91,34 @@ def test_passive_features_count_missing_frames():
     keep[[100, 2000, 4000]] = False
     f = passive_features(t[keep], cid[keep], 0.0, 60.0)
     assert f["miss_pm"] == 3 and f["gap_events_pm"] == 3
+
+
+def test_markov_model_matches_first_order_statistics():
+    """Cross-model test: same mean rate and duration, different structure."""
+    g = np.arange(0, 2000, 0.1)
+    v = np.ones(len(g))
+    q = ph.ContactParams()
+    m = ph.with_params(q, process="markov")
+    a = ph.sample_interruptions(g, v, 6.0, q, np.random.default_rng(0))
+    b = ph.sample_interruptions(g, v, 6.0, m, np.random.default_rng(1))
+    assert abs(len(b.start) / len(a.start) - 1) < 0.15
+    assert abs(b.dur.mean() / a.dur.mean() - 1) < 0.15
+    # bursty: inter-arrival coefficient of variation well above the Poisson value of 1
+    ia = np.diff(b.start)
+    assert ia.std() / ia.mean() > 1.5
+
+
+def test_markov_brownout_uses_cumulative_open_time():
+    m = ph.with_params(ph.ContactParams(), process="markov", p_power=1.0, d0=1e-4, holdup=1e-3)
+    it = ph.sample_interruptions(np.arange(0, 200, 0.1), np.ones(2000), 15.0, m, np.random.default_rng(2))
+    r = it.reset_len > 0
+    assert r.any()
+    assert (it.dur[r] < m.holdup).mean() > 0.5   # resets triggered by accumulation, not one long gap
+
+
+def test_transformer_baseline_shapes():
+    from ocwd.models import SeqTransformer
+    X = np.random.default_rng(0).random((64, 3, 300)).astype("float32")
+    y = np.random.default_rng(1).integers(0, 5, 64)
+    P = SeqTransformer(3, 5, epochs=1).fit(X, y).proba(X[:7])
+    assert P.shape == (7, 5) and np.allclose(P.sum(1), 1, atol=1e-5)

@@ -328,6 +328,41 @@ is therefore indicative, but the ordering does not.
 \label{sec:robust}
 \input{tables/robustness_text.tex}
 
+\subsection{Additional Validation}
+\label{sec:extra}
+Four further checks, detailed in the Supplementary Material, address the
+most likely objections to a physics-informed evaluation.
+
+\emph{A structurally different fault model.} To test whether ECTA learns
+the physics or merely the simulator, we generated test faults with a
+different process: a two-state (Gilbert--Elliott) contact that alternates
+between quiet periods and chatter episodes, with exponential rather than
+log-normal interruption durations and a brown-out criterion based on the
+\emph{cumulative} open time of an episode instead of a single long
+interruption. Its mean interruption rate and duration equal those of the
+nominal model; its temporal structure does not. Trained only on the nominal
+model, ECTA reaches an AUROC of 0.856 on full-bus captures (moderate 0.848,
+severe 0.999), against 0.880 on matched physics, and \emph{higher} values
+than on matched physics for the polling corpus (0.779) and VED (0.813),
+where the energy-based brown-out rule makes severe wear more visible.
+
+\emph{Window length.} Full-bus detection rises monotonically with the
+window: 0.824 (10~s), 0.879 (30~s) and 0.911 (60~s), with moderate wear at
+0.843, 0.895 and 0.930. The 30-s window used throughout is therefore not
+the most favourable choice; it trades a little accuracy for latency.
+
+\emph{Hyperparameters.} Hyperparameters were fixed once and never tuned.
+Across seven gradient-boosting configurations (200--1\,000 trees, 15--63
+leaves, learning rates 0.02--0.1) the overall AUROC varies by at most
+0.004 on full-bus captures, 0.007 on the polling corpus and 0.015 on VED.
+
+\emph{Operating points.} With the threshold set to detect 90\% of severely
+worn connectors, a full-bus tool raised \emph{no} false alarm on the real
+healthy windows of held-out vehicles (0.39 per hour at 95\% detection).
+For low-rate polling tools a single window cannot reach such a point, which
+is why vehicle-level pooling (Fig.~\ref{fig:acc}) is required before acting.
+\input{tables/extra_text.tex}
+
 \subsection{Feature Importance and Cost}
 On VED the five most important features by split gain are the dispersion
 of timeout-gap durations, the strong-event high/low excitation ratio, the

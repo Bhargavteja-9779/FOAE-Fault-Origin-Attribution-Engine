@@ -56,13 +56,31 @@ brown-outs from the tool's own background irregularity.
 On its own, $z_\beta$ is a training-free test: it needs no labels and no
 healthy data from the target vehicle. We report it as a separate method.
 
+
+\begin{algorithm}[!t]
+\caption{ECTA for One Telemetry Window}
+\label{alg:ecta}
+\begin{algorithmic}[1]
+\REQUIRE received frames or responses $\{(t_i,\mathrm{id}_i,\mathrm{payload}_i)\}$ in window $[t_0,t_0+W)$; trained classifiers $g_{\mathrm{det}}$, $g_{\mathrm{attr}}$
+\ENSURE wear score $\hat p$, fault origin $\hat c$, health index contribution $h$
+\STATE \textit{Loss features:} for every periodic identifier (or the polling loop) estimate the period $P$ by the median gap; count missing units $\mathrm{round}(\Delta/P)-1$ in every gap $\Delta \ge 1.5P$; record silences and the longest gap
+\STATE \textit{Structure features:} $\chi^2$ and Gini selectivity of losses across identifiers; lateness, bunching and jitter; load at loss instants; timeout-gap duration statistics
+\STATE \textit{Excitation proxy:} decode engine speed $n$ and vehicle speed $s$ from the \emph{received} data; $\hat v \leftarrow w_e n/2000 + w_r s/60$ on a 1--2-s grid
+\STATE \textit{Coherence:} bin loss events $y_j$; fit $y_j\sim\mathrm{Poisson}(e^{\alpha+\beta x_j})$, $x_j=\mathrm{std}(\ln(\hat v_j+0.05))$ by IRLS; keep $\hat\beta$, $z_\beta$, Spearman $\rho(y,\hat v)$, high/low-excitation rate ratio; repeat for strong events only
+\STATE $\mathbf f \leftarrow$ [loss, structure, coherence features]
+\STATE $\hat p \leftarrow g_{\mathrm{det}}(\mathbf f)$;\quad $\hat c \leftarrow \arg\max g_{\mathrm{attr}}(\mathbf f)$
+\STATE pool $\log\frac{\hat p}{1-\hat p}$ across windows or trips of the same vehicle; alarm when the pooled evidence exceeds the operating threshold
+\end{algorithmic}
+\end{algorithm}
+
 \subsection{Detection and Attribution}
 The feature vector (25 passive, 20 polling features) is classified by
 gradient-boosted decision trees (LightGBM~\cite{lightgbm}; 400 trees,
 learning rate 0.05, 31 leaves, class-balanced weights). The same features
 feed a binary detector (wear versus everything else, including
 confounders) and a five-way attribution classifier (healthy, DLC wear,
-ECU-side, bus EMI, overflow/random loss). The model is deliberately
+ECU-side, bus EMI, overflow/random loss); Algorithm~\ref{alg:ecta} summarizes
+the procedure. The model is deliberately
 small (a 1.3-MB tree ensemble) and the feature extraction is a single pass
 over the window, so ECTA can run on the tool or at the fleet back end.
 

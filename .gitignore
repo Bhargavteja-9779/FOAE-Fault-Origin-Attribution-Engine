@@ -11,3 +11,6 @@ paper/*.blg
 paper/*.bbl
 paper/*.fls
 paper/*.fdb_latexmk
+paper/word/render/
+paper/word/*_flat.tex
+paper/*.toc
