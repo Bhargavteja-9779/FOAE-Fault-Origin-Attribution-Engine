@@ -1,0 +1,173 @@
+\section{System Model}
+\label{sec:model}
+
+\begin{figure}[!t]
+\centering
+\resizebox{\columnwidth}{!}{%
+\begin{tikzpicture}[font=\footnotesize, >=Stealth,
+  box/.style={draw, rounded corners=2pt, align=center, minimum height=7mm, inner sep=3pt},
+  lab/.style={align=center, font=\scriptsize}]
+\node[box, minimum width=34mm] (bus) at (0,0) {In-vehicle CAN\\(ECUs, 500\,kbit/s)};
+\node[box, minimum width=20mm, fill=black!5] (dlc) at (3.1,0) {J1962 DLC\\$R(t)$};
+\node[box, minimum width=24mm] (tool) at (6.0,0) {Diagnostic tool\\(logger / tester)};
+\node[box, minimum width=24mm] (ecta) at (6.0,-1.7) {ECTA: features,\\coherence, GBM};
+\node[box, minimum width=34mm] (exc) at (0,-1.7) {Excitation $v(t)$\\engine + road};
+\draw[->, thick] (bus) -- node[above, lab]{CAN-H/L}(dlc);
+\draw[->, thick] (dlc) -- node[above, lab]{frames,\\responses}(tool);
+\draw[->] (tool) -- node[right, lab]{telemetry}(ecta);
+\draw[->, dashed] (exc) -- node[above, lab, pos=0.55]{fretting}(dlc.south west);
+\draw[->, dotted] (bus.south) -- node[left, lab]{rpm, speed}(exc.north);
+\draw[->, dotted] (exc.east) -- node[below, lab]{observed proxy $\hat v(t)$}(ecta.west);
+\node[lab, text=black!60] at (3.1,0.75) {pins 6/14 (CAN), 16/4/5 (supply)};
+\end{tikzpicture}}
+\caption{Problem setting. Vibration excitation $v(t)$ drives fretting of
+the DLC contacts and modulates their interruption rate. The tool observes
+only its own telemetry, from which ECTA also recovers an excitation proxy
+$\hat v(t)$.}
+\label{fig:system}
+\end{figure}
+
+Fig.~\ref{fig:system} summarizes the setting. A diagnostic tool is
+attached to the DLC. Through pins 6 and 14 it observes the vehicle's
+diagnostic CAN; through pin 16 (battery) and pins 4/5 (ground) it is
+powered. We distinguish three tool classes, which differ in what they
+record and therefore in what a degraded contact can do to their data:
+\begin{itemize}
+\item \textbf{Full-bus passive logger}: records every frame on the bus with
+  microsecond timestamps (e.g., a SocketCAN interface in listen-only mode).
+\item \textbf{Sampling passive logger}: a low-cost device that records only
+  the frames it can service (about 65~frames/s in the CANmodes
+  hardware, against several hundred to a few thousand on the bus).
+\item \textbf{OBD-II polling tester}: requests SAE~J1979 Mode-01 parameters
+  over ISO~15765-4~\cite{j1979,iso15765} and records the responses, as
+  ELM327-class dongles and fleet telematics units do.
+\end{itemize}
+
+\subsection{Wear State}
+Let $N(t)$ denote accumulated fretting exposure. Following the
+incubation-then-rise behaviour of tin-plated contacts~\cite{antler1985,
+bryant1994,park2008}, we model the contact resistance as a logistic law in
+log-resistance,
+\begin{equation}
+\ln R(N)=\ln R_0+\left(\ln R_{\max}-\ln R_0\right)\,
+\sigma\!\left(\frac{N-N_{50}}{w}\right),
+\label{eq:wear}
+\end{equation}
+where $\sigma(\cdot)$ is the logistic function, $R_0$ the as-new
+resistance, $R_{\max}$ the saturated resistance, $N_{50}$ the
+unit-specific mid-life exposure and $w$ the knee width. Exposure
+accumulates from vibration and thermal cycling,
+\begin{equation}
+N(t)=\int_0^t \bar v(\tau)\,d\tau + c_{\mathrm{th}}\, n_{\mathrm{trip}}(t),
+\label{eq:exposure}
+\end{equation}
+with $\bar v$ the deterministic part of the excitation defined below and
+$n_{\mathrm{trip}}$ the number of ignition (thermal) cycles. For the
+detection experiments we sample $R$ directly from four stages:
+healthy ($2$--$50$~m$\Omega$), incipient ($0.3$--$1.5\,\Omega$), moderate
+($1.5$--$6\,\Omega$) and severe ($6$--$30\,\Omega$), log-uniformly within
+each stage.
+
+\subsection{Excitation}
+The vibration intensity at the DLC is modelled as an engine-order term and
+a road term, modulated by an unobservable road-input factor:
+\begin{equation}
+v(t)=\underbrace{\Big(w_e\tfrac{n(t)}{2000}+w_r\tfrac{s(t)}{60}\Big)}_{\bar v(t)}
+\exp\!\Big(\sigma_u z(t)-\tfrac{\sigma_u^2}{2}\Big),
+\label{eq:vib}
+\end{equation}
+where $n$ is engine speed (rpm), $s$ is vehicle speed (km/h), and $z(t)$
+is a unit Ornstein--Uhlenbeck process with correlation time $\tau_u$.
+Crucially, $n(t)$ and $s(t)$ are the \emph{real} signals recorded in each
+capture, so every simulated interruption is driven by that vehicle's own
+measured operating history, while $z(t)$ ensures that the detector's
+excitation proxy is only an imperfect measurement of the true stimulus.
+
+\subsection{Intermittency}
+Under vibration, the instantaneous resistance of a fretted contact
+fluctuates about $R$. Modelling the fluctuation as log-normal with spread
+$\sigma$, the probability that a micro-motion cycle produces an excursion
+above the discontinuity threshold $R_{\mathrm{th}}$~\cite{uscar2} is
+$\Phi\big((\ln R-\ln R_{\mathrm{th}})/\sigma\big)$. Interruptions therefore
+form an inhomogeneous Poisson process with intensity
+\begin{equation}
+\lambda(t)=\nu_0\, v(t)\,
+\Phi\!\left(\frac{\ln R-\ln R_{\mathrm{th}}}{\sigma}\right),
+\label{eq:rate}
+\end{equation}
+where $\nu_0$ is the rate of micro-motion opportunities at unit
+excitation. Interruption durations are log-normal with median
+$d_0 (R/R_{\mathrm{th}})^{\gamma}$ and spread $\sigma_d$, capped at
+$d_{\max}$; a fraction $p_{\mathrm{pwr}}$ occurs on the supply pins. Since
+(\ref{eq:rate}) is proportional to $v(t)$, the loss process inherits the
+excitation's temporal structure: this is the signature ECTA exploits.
+
+\subsection{Telemetry Effects}
+\emph{Passive tool.} An interruption on CAN-H/L destroys, for the tool
+only, every frame whose on-wire interval $[t_i-T_f(i),\,t_i]$ intersects
+it, with $T_f=1.1(47+8\,\mathrm{DLC})/\text{bitrate}$. Because the rest of
+the network received the frame, nothing is retransmitted: the frame is
+simply missing from the log. A supply interruption longer than the tool's
+hold-up time $T_h$ causes a brown-out and silences the tool for
+$T_r\sim\mathcal U(0.3,1.5)$~s.
+
+\emph{Polling tester.} We replay each real polling session through the
+degraded link, preserving the capture's own inter-transaction gaps. A
+transaction whose request or response is on the wire during a CAN-line
+interruption is lost and costs the tester a timeout $T_o$; a brown-out
+halts polling until re-initialisation completes
+($T_r\sim\mathcal U(1,3)$~s), after which the loop resumes. All later
+responses shift accordingly, so the simulated session has exactly the
+real session's structure except where the fault acts.
+
+\subsection{Confounders}
+A useful detector must not confuse DLC wear with other causes of missing
+or late data. We model four, each from its own physics:
+\begin{enumerate}
+\item \textbf{ECU-side intermittent}: the same contact physics at one
+  ECU's connector. Its corrupted frames are error-signalled and
+  retransmitted after reconnection (late, not lost); interruptions longer
+  than \SI{10}{\milli\second} drive the ECU bus-off and silence its
+  frames during recovery. Only that ECU's identifiers are affected. In
+  polling mode, a supply interruption reboots the engine ECU
+  ($0.2$--$0.8$~s), and the tester accumulates consecutive timeouts.
+\item \textbf{Bus-wide EMI}: bursts of errors seen by every node,
+  including the tool; affected frames are retransmitted back-to-back after
+  the burst. Half of the instances are made ignition-coupled (rate
+  proportional to engine speed), so that excitation coherence alone cannot
+  separate them from wear.
+\item \textbf{Logger overflow} (passive): frames beyond the tool's service
+  capacity within a \SI{10}{\milli\second} interval are dropped---a
+  load-driven, vibration-independent loss.
+\item \textbf{Vibration-independent loss} (polling): transactions lost at
+  random (ECU busy, tester scheduling), at rates spanning those of
+  moderate wear.
+\end{enumerate}
+
+\begin{table}[!t]
+\caption{Nominal Parameters of the Degradation Model and Their Stress-Test Ranges}
+\label{tab:params}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}llll@{}}
+\toprule
+Symbol & Meaning & Nominal & Stress test (Sec.~\ref{sec:robust})\\
+\midrule
+$R_{\mathrm{th}}$ & discontinuity threshold & \SI{7}{\ohm}~\cite{uscar2} & 3, \SI{15}{\ohm}\\
+$\sigma$ & resistance fluctuation spread & 0.8 & 0.5, 1.2\\
+$\nu_0$ & opportunities at $v{=}1$ & \SI{20}{\per\second} & $\times0.5$, $\times2$\\
+$d_0,\gamma,\sigma_d$ & interruption duration & \SI{0.2}{\milli\second}, 1, 1 & $d_0\times\frac14$, $\times4$\\
+$p_{\mathrm{pwr}}$ & share on supply pins & 0.3 & 0.1, 0.6\\
+$T_h$ & tool hold-up time & \SI{2}{\milli\second} & 0.5, \SI{10}{\milli\second}\\
+$T_o$ & tester timeout & \SI{0.2}{\second} & ---\\
+$w_e, w_r$ & engine / road weights & 0.5, 0.5 & (1,0), (0,1)\\
+$\sigma_u,\tau_u$ & unobserved road input & 0.5, \SI{2}{\second} & $\sigma_u{=}0$, 1.0\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:params} lists the nominal parameters. Those not fixed by a
+standard are unmeasured for J1962 receptacles; rather than claim values for
+them, Section~\ref{sec:robust} trains on the nominal model and tests
+against each perturbed model.

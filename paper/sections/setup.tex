@@ -1,0 +1,93 @@
+\section{Experimental Setup}
+\label{sec:setup}
+
+\subsection{Real-Vehicle Data}
+Table~\ref{tab:data} summarizes the five public datasets. All are
+recordings made on real vehicles in real operation; none was produced for
+this study, so the healthy behaviour against which ECTA is scored is
+independent of our assumptions.
+
+\begin{table*}[!t]
+\caption{Real-Vehicle Telemetry Used in This Study (After Cleaning)}
+\label{tab:data}
+\centering
+\footnotesize
+\begin{tabular}{@{}lllrrrrl@{}}
+\toprule
+Corpus & Source & Vehicle(s) & Sessions & Hours & Frames / records & Windows & Excitation signals\\
+\midrule
+Full-bus passive & HCRL Car-Hacking~\cite{hcrl_gids} & KIA Soul & 2 & 0.27 & 1\,879\,939 & \multirow{2}{*}{777} & 0x316 (EMS11)\\
+                 & CAN-MIRGU~\cite{mirgu} & undisclosed & 1 & 0.05 & 368\,296 & & none decodable\\
+Sampling passive & CANmodes RAW~\cite{canmodes} & GM Cruze, Ford Fiesta, VW Gol & 63 & 10.65 & 2\,486\,941 & 12\,684 & 0x0C9/0x3E9, 0x201, 0x280/0x1A0\\
+OBD-II polling   & CANmodes OBD~\cite{canmodes} & GM Cruze, Ford Fiesta, VW Gol & 62 & 9.03 & 154\,185 & 8\,631 & PIDs 0x0C, 0x0D\\
+Fleet polling    & VED~\cite{ved} & 381 vehicles (ICE, HEV, PHEV, EV) & 11\,277 trips & 1\,283 & 9.0\,M & 236\,817 & engine and vehicle speed\\
+\bottomrule
+\multicolumn{8}{@{}l}{\scriptsize Windows include the real (healthy) window and one copy per fault condition and confounder, for three independent injection seeds.}
+\end{tabular}
+\end{table*}
+
+\emph{Cleaning.} The CANmodes logger writes timestamps as
+\texttt{<seconds>.<milliseconds>} with an unpadded millisecond field and a
+seconds field that lags the millisecond counter for up to one second after
+each wrap; one file also uses locale thousands separators. We reconstruct
+monotone time by resolving each stamp to the candidate in
+$\{t,t+1,t-1\}$~s that continues the sequence, drop rows with corrupted
+identifiers, and split files into sessions at gaps above 5~s (files
+concatenate recordings made on different days). The four HCRL attack
+captures embed an identical 482~s benign block, which we keep once; their
+attack segments are excluded entirely. All gaps shorter than 5~s are
+retained: they are the real background irregularity of healthy
+installations and constitute the false-alarm floor.
+
+\emph{Excitation decoding.} For passive captures, engine and vehicle speed
+were located by searching every 16-bit field for smooth, wide-range signals
+and checking scaled values against physical ranges; the GM layout agrees
+with public opendbc definitions and the VW layout with the PQ-platform
+\texttt{Motor\_1}/\texttt{Bremse\_1} messages. The CAN-MIRGU vehicle is
+undisclosed; ECTA then runs without coherence features, which tests its
+graceful degradation.
+
+\subsection{Labelled Windows}
+Each real window is kept unmodified (healthy) and is also replayed through
+the physical model of Section~\ref{sec:model} once per condition: DLC wear
+at the incipient, moderate and severe stages, and each confounder. This
+paired design means that every fault window has a real healthy twin, so a
+detector cannot exploit differences in driving between classes. The whole
+procedure is repeated with three independent random seeds.
+
+\subsection{Protocol}
+Splits are disjoint in the real data. The sampling-passive and polling
+corpora use leave-one-vehicle-out cross-validation (three folds); the
+full-bus corpus uses leave-one-capture-out (HCRL drive, HCRL idle,
+CAN-MIRGU); VED uses five-fold cross-validation grouped by vehicle
+(76--77 test vehicles per fold). All seeds of a real window stay in the
+same fold. Metrics are computed on pooled out-of-fold scores. We report the
+area under the ROC curve (AUROC) for wear versus \emph{all} other windows
+(healthy and confounders), the area under the precision--recall curve
+(AUPRC), the true-positive rate at 1\% false-positive rate (TPR@1\%), the
+per-stage AUROC, and macro-F1 for five-way attribution. Confidence
+intervals are 95\% percentile intervals from 500 bootstrap resamples of
+vehicles (or captures)~\cite{efron1993}, which respects the dependence
+between windows of the same vehicle.
+
+\subsection{Baselines}
+\begin{itemize}
+\item \textbf{U-code timeout rule}: the longest silence (passive) or
+  response gap (polling) in the window, i.e., the quantity behind
+  lost-communication diagnostic trouble codes.
+\item \textbf{Loss-rate threshold}: missing frames per minute (full-bus),
+  silences per minute (sampling) or excess time fraction (polling).
+\item \textbf{Isolation Forest}~\cite{iforest} and \textbf{one-class
+  SVM}~\cite{ocsvm} on the full ECTA feature vector, trained on healthy
+  windows only.
+\item \textbf{LSTM autoencoder}~\cite{malhotra2016} on the binned telemetry
+  sequence (frames per bin, distinct identifiers per bin, longest silence
+  per bin), trained on healthy windows; score = reconstruction error.
+\item \textbf{1D-CNN}: a three-block convolutional classifier trained
+  end-to-end on the same sequences (five classes).
+\item \textbf{Ablations} of ECTA: loss features only; loss and structure
+  (no coherence); loss and coherence.
+\item \textbf{Coherence test}: the training-free $z_\beta$ statistic.
+\end{itemize}
+Deep models are trained with Adam (learning rate $10^{-3}$, 15 epochs) on
+at most 40\,000 training windows per fold.

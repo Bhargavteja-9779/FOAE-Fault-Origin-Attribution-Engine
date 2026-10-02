@@ -1,0 +1,13 @@
+
+# OCWD data (downloaded / generated; see ocwd/README.md)
+data/raw
+data/cache/
+__pycache__/
+*.pyc
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/*.blg
+paper/*.bbl
+paper/*.fls
+paper/*.fdb_latexmk
