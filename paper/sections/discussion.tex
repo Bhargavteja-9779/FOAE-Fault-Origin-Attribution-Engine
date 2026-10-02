@@ -1,0 +1,87 @@
+\section{Discussion}
+\label{sec:discussion}
+
+\subsection{What the Evidence Supports}
+Across four public datasets, five vehicles analysed in detail and a
+381-vehicle fleet, the results support four claims. First, severe DLC wear
+is detectable from telemetry alone at every tool fidelity, and with
+near-certainty at the vehicle level once a handful of trips are pooled.
+Second, a full-bus logger detects wear one stage earlier (moderate,
+1.5--6\,$\Omega$) than sampling or polling tools, so the choice of tool,
+rather than the choice of algorithm, sets the earliest point at which wear
+can be seen. Third, excitation coherence is the feature family that makes
+polling-mode detection specific: it separates wear from bus-wide
+interference and from vibration-independent loss, which loss-counting
+rules and generic anomaly detectors cannot. Fourth, a health index learned
+from telemetry supports a short-horizon early warning with a low
+false-alarm rate, but not long-horizon RUL estimation for polling tools.
+
+\subsection{Practical Implications}
+For telematics and fleet operators the findings translate into concrete
+guidance: (i) log full-bus traffic, or at least CAN error counters and
+brown-out events, if early warning matters; (ii) never attribute data loss
+to a DLC from loss counts alone---check excitation coherence and, where
+possible, whether losses are spread across ECUs; (iii) pool evidence per
+vehicle across trips before acting; and (iv) treat the J1962 receptacle,
+not only the device, as a field-replaceable item when the pooled evidence
+is positive. These require no hardware change to existing devices.
+
+\subsection{Limitations and Threats to Validity}
+\emph{Fault realism.} The healthy telemetry, the excitation and the usage
+histories are real, but the connector faults are modelled. No public
+dataset of naturally worn J1962 connectors exists, and we do not claim
+measured values for the unmeasured constants of Table~\ref{tab:params}.
+We mitigated this in three ways: the model's \emph{structure} follows the
+contact literature and CAN/ISO~15765 behaviour; the detector never accesses
+model internals; and Section~\ref{sec:robust} quantifies how performance
+changes when the test physics differs from the training physics.
+Validation on connectors worn on a vibration rig and on field returns is
+the necessary next step; a pre-registered bench protocol for it has been
+prepared by the authors.
+
+\emph{Data coverage.} The full-bus corpus is small (two vehicles, 0.32~h),
+and its excitation variation is limited; the full-bus numbers carry wide
+confidence intervals and should be read as indicative. The sampling and
+polling corpora each cover three vehicles. VED provides breadth (381
+vehicles) but only through one, low-rate logger type.
+
+\emph{Post-hoc choices.} The 20-$\Omega$ failure threshold in the prognosis
+study was chosen after the pre-specified 6-$\Omega$ analysis; we report both.
+All other design choices (features, model, windows, splits) were fixed
+before the VED fleet experiments were run.
+
+\emph{Confounder coverage.} Four confounders were modelled; others exist
+(e.g., ignition-key cycling, deliberate tool sleep modes, cellular back-haul
+outages that drop already-logged data). The ECU-side confounder in
+polling mode is, as shown, not separable without multi-ECU visibility.
+
+\section{Conclusion}
+\label{sec:conclusion}
+This paper introduced excitation-coherent telemetry analysis for
+detecting, attributing and predicting the wear of the OBD-II diagnostic
+connector from the telemetry of the attached tool. A physics-informed model
+links fretting wear to the observable behaviour of three classes of
+diagnostic tool, and an evaluation on real data from four public datasets
+and a 381-vehicle fleet, with strictly disjoint splits and ten
+baselines, shows that (i) severe wear is detected at every fidelity
+(AUROC 0.85--0.98 against healthy telemetry, 0.999 at the vehicle level
+after pooling ten trips), (ii) moderate wear is detected only with full-bus
+capture (0.875), (iii) excitation coherence is what separates wear from its
+look-alikes in polling mode (AUROC against bus interference 0.947 vs.\
+0.737 without it), and (iv) telemetry supports early warnings with 88\%
+timely detection and 1.5\% false alarms, but not months-ahead RUL, for
+low-rate polling tools. Future work will validate the method on naturally
+worn connectors, extend it to CAN error-counter telemetry and CAN-FD, and
+investigate multi-ECU attribution.
+
+\section*{Data and Code Availability}
+All datasets used are public~\cite{hcrl_gids,mirgu,canmodes,ved}. The
+complete code for data cleaning, fault modelling, feature extraction,
+experiments, figures and tables is available from the authors' repository,
+together with scripts that reproduce every number reported here.
+
+\section*{Acknowledgment}
+The authors thank the creators of the HCRL Car-Hacking, CAN-MIRGU, CANmodes
+and Vehicle Energy datasets for making their recordings public. The
+method described here is related to Indian Patent Application
+202641074361~\cite{patent_in}.

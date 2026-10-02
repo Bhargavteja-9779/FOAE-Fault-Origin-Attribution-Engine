@@ -86,7 +86,8 @@ def fig_roc(corpora):
         ax.set_xlabel("False-positive rate")
         ax.set_aspect("equal")
     axs[0].set_ylabel("True-positive rate")
-    axs[-1].legend(loc="lower right", frameon=False, handlelength=1.8)
+    h, l = axs[0].get_legend_handles_labels()
+    fig.legend(h, l, loc="lower center", ncol=5, frameon=False, bbox_to_anchor=(0.5, -0.1), handlelength=2.2)
     fig.savefig(FIG / "fig_roc.pdf")
     plt.close(fig)
 
@@ -164,27 +165,28 @@ def fig_importance(c="ved"):
 
 
 def fig_prognosis():
-    ev = pd.read_parquet(paths.CACHE / "prognosis_eval.parquet")
+    ev = pd.read_parquet(paths.CACHE / "prognosis_eval_R20.parquet")
     tr = pd.read_parquet(paths.CACHE / "prognosis_trips.parquet")
     f = ev[ev.failed_in_data].copy()
     fig, axs = plt.subplots(1, 2, figsize=(7.16, 2.1))
     # (a) one vehicle: true log R and learned health index vs day
-    vid = f.groupby("vehicle").size().sort_values().index[-1]
+    vid = f.groupby("vehicle").size().sort_values().index[len(f.vehicle.unique()) // 2]
     g = tr[tr.vehicle == vid].sort_values("day")
     ax = axs[0]
     ax.plot(g.day, g.logR, color=INK2, lw=1.2, label="true log$_{10}$ R")
     ax.scatter(g.day, g.hi, s=6, color=BLUE, label="health index (per trip)", zorder=3)
-    ax.axhline(np.log10(6.0), color=RED, lw=0.9, ls="--", label="failure threshold")
+    ax.axhline(np.log10(20.0), color=RED, lw=0.9, ls="--", label="functional failure (20 Ω)")
+    ax.axhline(np.log10(6.0), color=ORANGE, lw=0.9, ls=":", label="severe onset (6 Ω)")
     ax.set_xlabel("Day of year (VED)")
     ax.set_ylabel("log$_{10}$ contact resistance (Ω)")
-    ax.legend(frameon=False, loc="upper left")
+    ax.legend(frameon=False, loc="upper left", fontsize=6)
     ax.set_title(f"(a) {vid}: real usage history")
     # (b) RUL error vs true RUL
     ax = axs[1]
     bins = np.array([0, 15, 30, 45, 60, 90, 120, 180, 270])
     mid = 0.5 * (bins[1:] + bins[:-1])
-    for name, col, lab in (("proposed", BLUE, "Proposed (HI + wear law)"), ("raw_hi", AQUA, "Wear law on raw statistic"),
-                           ("linear", ORANGE, "Linear HI extrapolation"), ("fleet", MUTED, "Fleet reliability")):
+    for name, col, lab in (("proposed", BLUE, "Bayesian wear law + HI"), ("conditional", AQUA, "Conditional reliability (no HI)"),
+                           ("raw_hi", ORANGE, "Bayesian wear law + raw statistic"), ("fleet", MUTED, "Fleet reliability")):
         err = np.abs(np.clip(f[name], 0, 1000) - f.true_rul)
         b = np.digitize(f.true_rul, bins) - 1
         mae = [err[b == i].median() if (b == i).any() else np.nan for i in range(len(mid))]
@@ -217,27 +219,72 @@ def fig_robustness():
     plt.close(fig)
 
 
+def _bold_best(vals, fmt="{:.3f}"):
+    best = max(v for v in vals if v is not None)
+    return [("--" if v is None else (r"\textbf{" + fmt.format(v) + "}" if abs(v - best) < 5e-4 else fmt.format(v)))
+            for v in vals]
+
+
 def tables(corpora):
-    """LaTeX bodies for the detection and attribution tables."""
+    """LaTeX table bodies written to ocwd/results/*.tex (pasted into the paper)."""
     order = [PROP, "GBM w/o coherence", "GBM loss only", "1D-CNN (supervised)", "LSTM autoencoder",
              "Isolation Forest", "One-class SVM", "Loss-rate threshold", "U-code timeout rule",
              "Coherence test (no training)"]
+    nice = {PROP: r"\textbf{ECTA (proposed)}", "GBM w/o coherence": "ECTA w/o coherence",
+            "GBM loss only": "ECTA loss features only", "Coherence test (no training)": r"Coherence test $z_\beta$ (no training)"}
     R = {c: load(c) for c in corpora}
+    with open(paths.RESULTS / "detection_extra.json", encoding="utf-8") as fh:
+        X = json.load(fh)
+    # Table: detection.  per corpus: AUROC(all), moderate-vs-healthy, severe-vs-healthy
+    cols = {}
+    for c in corpora:
+        cols[(c, "all")] = [R[c]["detection"].get(m, {}).get("auroc") for m in order]
+        cols[(c, "s2")] = [X[c].get(m, {}).get("s2_vs_healthy") for m in order]
+        cols[(c, "s3")] = [X[c].get(m, {}).get("s3_vs_healthy") for m in order]
+    cols = {k: _bold_best(v) for k, v in cols.items()}
     lines = []
-    for m in order:
-        cells = []
-        for c in corpora:
-            d = R[c]["detection"].get(m)
-            if d is None:
-                cells += ["--"] * 3
-                continue
-            best = max(R[c]["detection"].values(), key=lambda x: x["auroc"])["auroc"]
-            a = f"{d['auroc']:.3f}"
-            a = r"\textbf{" + a + "}" if abs(d["auroc"] - best) < 5e-4 else a
-            cells += [a, f"{d['auroc_s2']:.3f}", f"{d['auroc_s3']:.3f}"]
-        name = m.replace("Proposed (GBM, all features)", r"\textbf{Proposed (ECTA)}")
-        lines.append(name + " & " + " & ".join(cells) + r" \\")
+    for i, m in enumerate(order):
+        cells = [cols[(c, k)][i] for c in corpora for k in ("all", "s2", "s3")]
+        lines.append(nice.get(m, m) + " & " + " & ".join(cells) + r" \\")
     (paths.RESULTS / "table_detection.tex").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    # Table: discrimination against confounders
+    lines = []
+    for c in corpora:
+        ms = [PROP, "GBM w/o coherence", "1D-CNN (supervised)", "U-code timeout rule"]
+        for j, m in enumerate(ms):
+            row = [X[c][m][f"wear_vs_{k}"] for k in ("ecu", "emi", "ovf")]
+            name = (CORPUS_LABEL[c] if j == 0 else "")
+            lines.append(f"{name} & {nice.get(m, m)} & " + " & ".join(f"{v:.3f}" for v in row) + r" \\")
+        lines.append(r"\midrule")
+    (paths.RESULTS / "table_confounders.tex").write_text("\n".join(lines[:-1]) + "\n", encoding="utf-8")
+    # Table: attribution
+    lines = []
+    for c in corpora:
+        a = X[c]["attribution"]
+        pc = a["per_class_f1_excl_incipient"]
+        cnn = R[c]["attribution"].get("1D-CNN (supervised)", {}).get("macro_f1")
+        lines.append(f"{CORPUS_LABEL[c]} & {a['macro_f1_all']:.3f} & {a['macro_f1_excl_incipient']:.3f} & "
+                     + " & ".join(f"{v:.2f}" for v in pc) + f" & {cnn:.3f}" + r" \\")
+    (paths.RESULTS / "table_attribution.tex").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    # Table: prognosis
+    lines = []
+    nm = {"proposed": "Bayesian wear law + HI (proposed)", "conditional": "Conditional reliability (no HI)",
+          "linear": "HI trend extrapolation", "raw_hi": "Bayesian wear law + raw statistic",
+          "fleet": "Fleet reliability (exposure)"}
+    for rf in (6, 20):
+        f = paths.RESULTS / f"prognosis_R{rf}.json"
+        if not f.exists():
+            continue
+        P = json.load(open(f, encoding="utf-8"))
+        lines.append(r"\multicolumn{7}{@{}l}{\emph{Failure at " + f"{rf}" + r"\,$\Omega$" +
+                     (" (pre-specified)" if rf == 6 else " (functional failure; added post hoc)") +
+                     f", {P['n_failing']} of {P['n_vehicles']} vehicles fail" + r"}} \\")
+        for k in ("proposed", "conditional", "linear", "fleet"):
+            r = P["methods"][k]
+            mae = "--" if r["mae_all"] > 300 else f"{r['mae_all']:.0f}"
+            lines.append(f"{nm[k]} & {mae} & {r['timely_rate']*100:.0f} & {r['premature_rate']*100:.0f} & "
+                         f"{r['missed_rate']*100:.0f} & {r['median_lead_days']:.1f} & {r['false_alarm_rate_nonfailing']*100:.1f}" + r" \\")
+    (paths.RESULTS / "table_prognosis.tex").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
 def main():

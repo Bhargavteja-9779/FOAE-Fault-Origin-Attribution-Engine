@@ -1,0 +1,258 @@
+\section{Results}
+\label{sec:results}
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{fig_trace.pdf}
+\caption{A real 8-minute drive of the HCRL KIA Soul (top: decoded vehicle
+speed) replayed through a moderately (middle) and severely (bottom) worn
+DLC. Losses cluster where the vehicle is moving and vanish at standstill:
+the excitation coherence that ECTA measures. Severe wear adds brown-out
+silences (tall bars).}
+\label{fig:trace}
+\end{figure}
+
+Fig.~\ref{fig:trace} illustrates the phenomenon on real data before any
+statistics: in the same drive, losses from a worn DLC follow the vehicle's
+motion, while the tool sees nothing at standstill.
+
+\subsection{Detection}
+
+\begin{table*}[!t]
+\caption{Detection Performance (AUROC) on Real-Vehicle Telemetry. ``All'': DLC Wear (Any Stage) vs. Healthy \emph{and} Confounder Windows. ``Mod.''/``Sev.'': Moderate/Severe Wear vs. Real Healthy Windows Only. Vehicle- or Capture-Disjoint Splits; Best per Column in Bold.}
+\label{tab:detection}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3.6pt}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}l ccc ccc ccc ccc@{}}
+\toprule
+ & \multicolumn{3}{c}{Full-bus passive} & \multicolumn{3}{c}{Sampling passive} & \multicolumn{3}{c}{OBD-II polling} & \multicolumn{3}{c}{VED fleet (381 vehicles)}\\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(lr){8-10}\cmidrule(l){11-13}
+Method & All & Mod. & Sev. & All & Mod. & Sev. & All & Mod. & Sev. & All & Mod. & Sev.\\
+\midrule
+\tinput{tables/table_detection.tex}
+\bottomrule
+\end{tabular}}
+\end{table*}
+
+Table~\ref{tab:detection} reports detection on all four corpora. Three
+findings stand out.
+
+\emph{(i) ECTA is the only method that is strong on both questions.} On the
+realistic task---wear against everything else, confounders
+included---ECTA has the highest AUROC on the full-bus (0.869), polling
+(0.723) and fleet (0.775, 95\% CI 0.772--0.778) corpora and is
+statistically tied with the 1D-CNN on the sampling corpus (0.675 vs.\
+0.677, overlapping CIs). Single-statistic rules are excellent at telling
+severe wear from \emph{healthy} data (e.g., the U-code timeout rule reaches
+0.962 on the polling corpus and the loss-rate threshold 0.984 on full-bus
+captures), but they collapse to 0.56--0.62 once confounders are present,
+because every confounder also produces losses or timeouts. The unsupervised
+detectors (Isolation Forest, one-class SVM, LSTM autoencoder) flag
+\emph{any} abnormality and therefore also cannot separate wear from its
+look-alikes (0.54--0.65 overall).
+
+\emph{(ii) Detectability is governed by the wear stage and by the tool.}
+Severe wear (6--30\,$\Omega$, where brown-outs begin) is detected against
+healthy telemetry at every fidelity: 0.979 (full-bus), 0.957 (sampling),
+0.891 (polling) and 0.851 (VED). Moderate wear (1.5--6\,$\Omega$) is
+detected reliably only by the full-bus logger (0.875, CI 0.79--0.95): its
+interruptions last tens to hundreds of microseconds and destroy individual
+frames, which only a tool that sees every frame can count. To a sampling
+logger or a polling tester transacting about once per second they are
+almost invisible (0.49--0.56). Incipient wear is indistinguishable from
+healthy telemetry in any single window (AUROC 0.50 for all methods; not
+tabulated). These limits are physical, not algorithmic: they follow from
+the duty cycle of the observation, and no method in Table~\ref{tab:detection}
+escapes them.
+
+\emph{(iii) Excitation coherence is what makes polling-mode detection
+work.} Removing the coherence features costs 0.037 AUROC on the polling
+corpus and 0.071 on VED (on VED the gain over the strongest
+alternative, ECTA without structure features, has a 95\% CI of
+$+0.017$ to $+0.019$), while on the full-bus corpus, whose
+driving segment is short and whose idle and CAN-MIRGU segments carry no
+usable excitation variation, it changes nothing---as expected. The
+training-free $z_\beta$ test alone is not a detector (AUROC $\approx$0.5):
+coherence is a \emph{discriminating} feature, informative only in
+combination with evidence that losses exist.
+
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=\textwidth]{fig_roc.pdf}
+\caption{ROC curves (wear vs.\ healthy and confounders) on the four corpora,
+pooled out-of-fold scores.}
+\label{fig:roc}
+\end{figure*}
+
+\subsection{Telling Wear from Its Look-Alikes}
+
+\begin{table}[!t]
+\caption{Discrimination of Moderate/Severe DLC Wear From Each Confounder (AUROC)}
+\label{tab:conf}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{@{}llccc@{}}
+\toprule
+Corpus & Method & ECU-side & Bus EMI & Overfl./rand.\\
+\midrule
+\tinput{tables/table_confounders.tex}
+\bottomrule
+\end{tabular}}
+\end{table}
+
+Table~\ref{tab:conf} isolates the attribution question. Against bus-wide
+EMI, coherence features raise the AUROC from 0.741 to 0.878 on the polling
+corpus and from 0.737 to 0.947 on VED, even though half of the simulated
+EMI was deliberately made ignition-coupled. The separation comes from the
+joint footprint: DLC interruptions remove transactions and correlate with
+\emph{both} engine and road excitation, whereas EMI delays transactions and
+correlates, at most, with engine speed. Against vibration-independent loss,
+coherence adds 0.031 on VED. Against an ECU-side intermittent no
+telemetry feature helps in polling mode (0.73--0.76 for all methods): an
+intermittent engine-ECU connector and an intermittent DLC both make Mode-01
+responses disappear, both are vibration-driven, and a tester that talks
+only to that ECU cannot tell them apart. On the full-bus corpus, where the
+selectivity of losses across identifiers is observable, the same
+distinction reaches 0.936. This is a structural limit worth stating
+plainly: attributing a fault to the DLC rather than to an ECU connector
+requires visibility of traffic from more than one ECU.
+
+\begin{table}[!t]
+\caption{Five-Way Fault-Origin Attribution: Macro-F1 (All Windows; Excluding Incipient Windows), Per-Class F1 (Excluding Incipient), and the 1D-CNN Macro-F1}
+\label{tab:attr}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{2.4pt}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{@{}lcc ccccc c@{}}
+\toprule
+ & \multicolumn{2}{c}{ECTA macro-F1} & \multicolumn{5}{c}{ECTA per-class F1} & CNN\\
+\cmidrule(lr){2-3}\cmidrule(lr){4-8}
+Corpus & all & excl. & Hlth. & DLC & ECU & EMI & Ovf. & all\\
+\midrule
+\tinput{tables/table_attribution.tex}
+\bottomrule
+\end{tabular}}
+\end{table}
+
+Table~\ref{tab:attr} summarizes the full five-way attribution. ECTA
+outperforms the end-to-end 1D-CNN by 0.06--0.40 macro-F1 on three corpora
+and is comparable on the sampling corpus, where all methods are limited by
+the logger. Fig.~\ref{fig:conf} shows the VED confusion matrix: bus EMI
+and overflow/random loss are recognized reliably; the dominant confusions
+are healthy~$\leftrightarrow$~early wear (physically indistinguishable in a
+single trip) and DLC~$\leftrightarrow$~ECU-side (the structural limit above).
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=0.82\columnwidth]{fig_confusion_ved.pdf}
+\caption{Row-normalized attribution confusion matrix, VED fleet
+(381 vehicles, vehicle-disjoint folds).}
+\label{fig:conf}
+\end{figure}
+
+\subsection{Pooling Evidence Across Trips}
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{fig_accumulation.pdf}
+\caption{Vehicle-level detection on VED when the per-trip log-odds of $K$
+trips of the same vehicle are averaged. Negatives include healthy and all
+confounder trips.}
+\label{fig:acc}
+\end{figure}
+
+A worn DLC stays worn, whereas the background irregularity of healthy
+telemetry is trip-local. Fig.~\ref{fig:acc} exploits this. Averaging the
+per-trip evidence of $K$ trips of the same vehicle raises severe-wear
+detection on VED from 0.907 ($K{=}1$) to 0.987 ($K{=}3$) and 0.9998
+($K{=}10$) against all negatives, and from 0.850 to 0.999 against healthy
+vehicles alone. Pooling does not, however, create evidence that is not
+there: moderate and incipient wear remain at chance against healthy
+vehicles for every $K$ (0.46--0.50), confirming that for a
+$\sim$1.3\,Hz polling logger their footprint lies below the logger's own
+background irregularity (the healthy VED trips contain, on median, 31
+gaps longer than 0.8\,s per minute).
+
+\subsection{Fleet Prognosis}
+
+\begin{table}[!t]
+\caption{Fleet Prognosis on VED (166 Vehicles, 21\,824 Real Trips). MAE of RUL (Days) for Failing Vehicles; Alarm When Predicted RUL $<30$ Days: Timely ($\le 60$ Days Before Failure), Premature, Missed (\% of Failing Vehicles), Median Lead (Days), False Alarms (\% of Non-Failing Vehicles)}
+\label{tab:prog}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{2.2pt}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+Method & MAE & Timely & Prem. & Missed & Lead & FA\\
+\midrule
+\tinput{tables/table_prognosis.tex}
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=\textwidth]{fig_prognosis.pdf}
+\caption{Fleet prognosis on VED. (a) One vehicle's connector, wearing with
+its own recorded usage: true resistance and the per-trip health index
+learned from telemetry by a vehicle-disjoint model. (b) Median absolute RUL
+error versus true RUL across all failing vehicles (20-$\Omega$ failure
+definition; the trend alarm is not a point estimator and is omitted).}
+\label{fig:prog}
+\end{figure*}
+
+The 166 VED vehicles with at least 60 trips over at least 200 days were
+each given a connector that wears with that vehicle's own recorded usage
+(21\,824 real trips). The learned health index tracks the true contact
+resistance with $R^2=0.86$ (Spearman 0.77) on held-out vehicles
+(Fig.~\ref{fig:prog}a), but its information is concentrated above
+$\approx$2--4\,$\Omega$; below that it is left-censored, as the detection
+results predict.
+
+Table~\ref{tab:prog} reports the consequences honestly. With failure
+pre-specified at the onset of the severe stage (6\,$\Omega$), the
+detectability floor and the failure threshold nearly coincide, and
+\emph{no} telemetry-based method beats the population reliability prior:
+the RUL error is 64--71~days for all of them. We then evaluated the
+threshold that matters operationally---functional failure of the tool link
+at 20\,$\Omega$, where brown-outs dominate---noting that this second
+threshold was chosen after seeing the first result. There, a simple alarm
+on the trend of the learned health index warns 88\% of failing vehicles
+in time (median lead 6.4 days) with a 1.5\% false-alarm rate on vehicles
+that do not fail, whereas the fleet-reliability schedule, which uses
+the same exposure information but no telemetry, is timely for only 36\%
+and false-alarms on 61\%. Point estimates of RUL months ahead, by
+contrast, are not improved by telemetry at this tool fidelity
+(Fig.~\ref{fig:prog}b): the Bayesian exposure-domain estimator, which
+correctly treats sub-floor readings as censored, matches the conditional
+reliability model but does not beat it. Long-horizon RUL from telemetry
+therefore requires a tool that sees moderate wear, i.e., full-bus capture.
+
+\subsection{Robustness to Mis-Specified Physics}
+\label{sec:robust}
+\input{tables/robustness_text.tex}
+
+\subsection{Feature Importance and Cost}
+On VED the five most important features by split gain are the dispersion
+of timeout-gap durations, the strong-event high/low excitation ratio, the
+longest gap, long gaps per minute and the all-event excitation ratio
+(Fig.~\ref{fig:imp}); coherence features account for
+\input{tables/coh_share.tex}\unskip\% of the total gain. Feature extraction
+takes 23~ms for a 30-s full-bus window containing 58\,583 frames and
+4.8~ms for a 120-s polling window in unoptimized Python, and the trained
+detector is a 1.3-MB tree ensemble; ECTA is therefore deployable on the
+tool or at the fleet back end at negligible cost.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{fig_importance_ved.pdf}
+\caption{Twelve most important ECTA features on VED (share of split
+gain). Blue: excitation-coherence features.}
+\label{fig:imp}
+\end{figure}

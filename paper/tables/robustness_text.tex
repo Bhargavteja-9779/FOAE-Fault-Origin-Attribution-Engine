@@ -1,0 +1,34 @@
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{fig_robustness.pdf}
+\caption{Robustness of VED detection when the test data are generated with
+mis-specified physics (training always uses the nominal model of
+Table~\ref{tab:params}). Dotted lines: nominal test physics. AUROC against
+healthy and confounder trips; held-out half of the vehicles.}
+\label{fig:robust}
+\end{figure}
+
+The constants of Table~\ref{tab:params} that are not fixed by standards
+are unmeasured for J1962 receptacles. We therefore trained ECTA once on
+the nominal model and tested it on held-out real data generated with each
+constant perturbed (Fig.~\ref{fig:robust}; full-bus results in the
+released code). Two regimes emerge. Detection is insensitive---within
+$\pm0.02$ AUROC of nominal on VED (0.748) and within $\pm0.06$ on the
+full-bus corpus (0.908)---to the resistance fluctuation spread $\sigma$,
+the opportunity rate $\nu_0$, the magnitude of the unobserved road input,
+and the composition of the excitation (engine-only or road-only), i.e., to
+the constants that shape \emph{where} and \emph{how often} interruptions
+occur. It is sensitive to the constants that decide whether interruptions
+cause \emph{brown-outs}: shorter interruptions ($d_0\times\frac14$), a
+longer tool hold-up time (\SI{10}{\milli\second}), a higher discontinuity
+threshold (\SI{15}{\ohm}) or fewer supply-pin interruptions
+($p_{\mathrm{pwr}}=0.1$) lower severe-stage AUROC on VED from 0.887 to
+0.62--0.79, while the opposite perturbations raise it to 0.93--0.97. On
+the full-bus corpus, which counts individual lost frames, the same
+perturbations cost far less (all-negative AUROC 0.83--0.97). The
+practical reading is that a polling tool sees wear chiefly through
+brown-outs, so the two quantities most worth measuring first on a bench
+are the interruption-duration distribution of worn receptacles and the
+hold-up time of the tool itself---the latter a design parameter that,
+somewhat counter-intuitively, makes a tool a \emph{better} wear sensor
+when it is short.
