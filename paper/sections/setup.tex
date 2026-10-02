@@ -101,6 +101,8 @@ between windows of the same vehicle.
   per bin), trained on healthy windows; score = reconstruction error.
 \item \textbf{1D-CNN}: a three-block convolutional classifier trained
   end-to-end on the same sequences (five classes).
+\item \textbf{Transformer}: a two-layer, four-head encoder ($d=32$) on the
+  same sequences, temporally pooled to at most 60 tokens (Supplement S10).
 \item \textbf{Ablations} of ECTA: loss features only; loss and structure
   (no coherence); loss and coherence.
 \item \textbf{Coherence test}: the training-free $z_\beta$ statistic.

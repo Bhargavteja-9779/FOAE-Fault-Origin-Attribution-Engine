@@ -36,7 +36,7 @@ The main contributions are:
   0.93 with the measured performance);
 \item an evaluation on five public real-vehicle datasets (nine vehicles in
   detail and a 381-vehicle fleet) with strictly vehicle-disjoint splits and
-  ten baseline and ablation models. On unseen vehicles a full-bus tool
+  eleven baseline and ablation models. On unseen vehicles a full-bus tool
   detects wear with AUROC 0.880 (moderate 0.891, severe 0.995) and confirms
   moderate wear within two minutes of driving, whereas deep sequence
   baselines reach 0.646.
@@ -45,11 +45,15 @@ The main contributions are:
 We have taken care to report the limits of the approach as clearly as its
 successes: the connector faults are modelled on top of real telemetry (no
 public dataset of naturally worn J1962 connectors exists), the unmeasured
-constants of the model are stress-tested by deliberate mis-specification,
+constants of the model are stress-tested by deliberate mis-specification
+and by a structurally different fault process (on which a full-bus tool
+still reaches AUROC 0.856),
 and the negative findings (incipient wear, moderate wear for low-rate
 tools, and months-ahead remaining-life estimation) are reported in full.
-All code is publicly available, and every reported number can be
-reproduced from it.
+A Supplementary Material document reports the complete results, paired
+significance tests against every baseline, hyperparameter and window-length
+sensitivity, and false-alarm rates per hour of real driving. All code is
+available, and every reported number can be reproduced from it.
 
 The work spans intelligent transportation, vehicular electronics,
 fault diagnosis and prognostics and health management, which we believe

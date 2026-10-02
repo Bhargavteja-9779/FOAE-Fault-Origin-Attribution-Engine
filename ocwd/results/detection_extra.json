@@ -48,6 +48,14 @@
       "wear_vs_emi": 0.7120480079083975,
       "wear_vs_ovf": 0.7038119483330523
     },
+    "Transformer (supervised)": {
+      "s1_vs_healthy": 0.49736113453645925,
+      "s2_vs_healthy": 0.5279277000056221,
+      "s3_vs_healthy": 0.9067483742808418,
+      "wear_vs_ecu": 0.7119619197541276,
+      "wear_vs_emi": 0.7157907929011826,
+      "wear_vs_ovf": 0.7139712289874627
+    },
     "LSTM autoencoder": {
       "s1_vs_healthy": 0.5000281104177208,
       "s2_vs_healthy": 0.5239448051948051,
@@ -195,6 +203,14 @@
       "wear_vs_emi": 0.7664249466397672,
       "wear_vs_ovf": 0.7666124841015746
     },
+    "Transformer (supervised)": {
+      "s1_vs_healthy": 0.5005415210833832,
+      "s2_vs_healthy": 0.554522005613789,
+      "s3_vs_healthy": 0.9422523195863728,
+      "wear_vs_ecu": 0.745969733905433,
+      "wear_vs_emi": 0.7480149810680818,
+      "wear_vs_ovf": 0.747625134618852
+    },
     "LSTM autoencoder": {
       "s1_vs_healthy": 0.5000415734689998,
       "s2_vs_healthy": 0.5342716145490696,
@@ -324,6 +340,14 @@
       "wear_vs_emi": 0.735714558218865,
       "wear_vs_ovf": 0.7502948452563953
     },
+    "Transformer (supervised)": {
+      "s1_vs_healthy": 0.5016315976764945,
+      "s2_vs_healthy": 0.5142430156371585,
+      "s3_vs_healthy": 0.8620170243947038,
+      "wear_vs_ecu": 0.7193040270632756,
+      "wear_vs_emi": 0.7301414402130121,
+      "wear_vs_ovf": 0.7382326649735675
+    },
     "LSTM autoencoder": {
       "s1_vs_healthy": 0.5001144519232856,
       "s2_vs_healthy": 0.5506222830001402,
@@ -452,6 +476,14 @@
       "wear_vs_ecu": 0.7562028632303341,
       "wear_vs_emi": 0.7337904199549636,
       "wear_vs_ovf": 0.8411639154269008
+    },
+    "Transformer (supervised)": {
+      "s1_vs_healthy": 0.49917417797542946,
+      "s2_vs_healthy": 0.499045704141556,
+      "s3_vs_healthy": 0.7574070222296727,
+      "wear_vs_ecu": 0.6228866766187996,
+      "wear_vs_emi": 0.6320632869236931,
+      "wear_vs_ovf": 0.6449019691910043
     },
     "LSTM autoencoder": {
       "s1_vs_healthy": 0.4999940460617579,

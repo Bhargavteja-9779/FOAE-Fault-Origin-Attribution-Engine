@@ -1,1 +1,12 @@
 
+\emph{A Transformer baseline.} A supervised Transformer encoder trained
+end-to-end on the same binned sequences and folds does not close the gap:
+it reaches an overall AUROC of 0.641 on full-bus captures, 0.665 on the
+sampling and polling corpora and 0.590 on VED (ECTA: 0.880, 0.675, 0.723
+and 0.775). On unseen vehicles, three different sequence architectures
+(1D-CNN, LSTM autoencoder, Transformer) all fall well short of the
+physics-derived features. Paired vehicle-bootstrap tests (Supplement S11)
+confirm that ECTA's advantage over every non-ECTA baseline on the full-bus
+corpus (six vehicles) and on VED (381 vehicles) is significant at
+$p\le 0.001$, the resolution of 1\,000 resamples; the polling corpus shows
+the same direction but, with three vehicles, supports no formal test.

@@ -15,6 +15,25 @@ Cover letter: `pdflatex cover_letter` (2 pages).
 - [x] Affiliation (School of Computer Science and Engineering, VIT) and corresponding author (Ragavan K).
 - [x] Limitations, post-hoc choices and the related patent application disclosed in the paper.
 - [x] Cover letter with the originality, approval and competing-interest statements.
+- [x] Self-review as three referees; every fixable concern answered with new experiments:
+      cross-model test (Markov fault process), Transformer baseline, hyperparameter sensitivity,
+      window length, operating points and calibration, paired significance tests (Supplement S8–S13).
+- [x] Supplementary Material (generated from the result files), graphical abstract, highlights,
+      response-to-reviewers template, Word versions of all documents.
+- [x] Reproducibility: `ocwd/requirements.txt`, `ocwd/get_data.sh`, `ocwd/run_all.sh`, CI workflow,
+      `CITATION.cff`, 14 unit tests.
+
+## What to upload (IEEE Author Portal / ScholarOne)
+
+| Item | File |
+|---|---|
+| Main manuscript (PDF, version of record) | `main.pdf` |
+| LaTeX source | `main.tex`, `sections/`, `tables/`, `figures/`, `refs.bib`, `main.bbl`, `ieeeaccess.cls`, logo PNGs |
+| Cover letter | `cover_letter.pdf` (Word: `word/Cover_Letter.docx`) |
+| Supplementary material | `supplementary.pdf` (Word: `word/Supplementary_Material.docx`) |
+| Graphical abstract (optional) | `figures/graphical_abstract.png` |
+| Editable Word copy of the manuscript | `word/Manuscript_IEEE_Access.docx` (LaTeX PDF remains the version of record) |
+| Kept for the revision round | `response_to_reviewers.tex` / `word/Response_to_Reviewers_Template.docx`, `highlights.md` |
 
 ## You must do before uploading (search the source for `[ADD`)
 
@@ -28,9 +47,14 @@ Cover letter: `pdflatex cover_letter` (2 pages).
    `https://github.com/Bhargavteja-9779/FOAE-Fault-Origin-Attribution-Engine` (directory `ocwd`).
    Push or merge the `claude/obdii-wear-detection-dataset-c3g668` branch so that the link works
    for reviewers.
-5. **Patent.** Confirm with your patent agent that publishing is fine (application
+5. **Licence (important).** The repository's `LICENSE` file says *"Proprietary – all rights
+   reserved"*, but the paper says the code is publicly available. Either make the repository
+   public under an open licence (MIT or Apache-2.0; see `ocwd/docs/GIT_GUIDE.md` §5), or change
+   the availability sentence to "available from the corresponding author on reasonable request".
+   Reviewers do check this.
+6. **Patent.** Confirm with your patent agent that publishing is fine (application
    202641074361 is already filed, so this is normally fine).
-6. **IEEE Author Portal (ScholarOne).** Upload `main.pdf` and the LaTeX source (`main.tex`,
+7. **IEEE Author Portal (ScholarOne).** Upload `main.pdf` and the LaTeX source (`main.tex`,
    `sections/`, `tables/`, `figures/`, `refs.bib`, `main.bbl`, `ieeeaccess.cls`, the logo PNGs),
    run PDF eXpress if asked, and pay the article processing charge on acceptance.
 

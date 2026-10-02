@@ -222,7 +222,7 @@ differ. The detector is trained only on the nominal model.
             d = j(f"detection_{c}.json")["detection"]
             rows.append([CL[c], f3(r["auroc_all"]), f"[{r['auroc_all_ci'][0]:.3f}, {r['auroc_all_ci'][1]:.3f}]",
                          f3(r["s2_vs_healthy"]), f3(r["s3_vs_healthy"]), f3(d[PROP]["auroc"]), f3(d["1D-CNN (supervised)"]["auroc"])])
-        parts.append("\\section{Transformer baseline}\nA 2-layer, 4-head Transformer encoder ($d=32$, temporal pooling to $\\le$150 tokens) is trained end-to-end on the binned sequences with the same folds as all other methods.\n"
+        parts.append("\\section{Transformer baseline}\nA 2-layer, 4-head Transformer encoder ($d=32$, temporal average pooling to $\\le$60 tokens) is trained end-to-end on the binned sequences with the same folds as all other methods. Because of its CPU cost it is trained on at most 10\\,000 windows per fold for 8 epochs (the 1D-CNN: 40\\,000 windows, 15 epochs).\n"
                      + table("Transformer baseline vs.\\ ECTA and the 1D-CNN (AUROC).", "tab:s_tf",
                              ["Corpus", "Transformer", "95\\% CI", "Moderate", "Severe", "ECTA", "1D-CNN"], rows))
     # S11 significance
@@ -233,9 +233,9 @@ differ. The detector is trained only on the nominal model.
             for m, r in d.items():
                 pv = r["p_value"]
                 rows.append([CL[c], m, f"{r['delta_auroc']:+.3f}", f"[{r['ci'][0]:+.3f}, {r['ci'][1]:+.3f}]",
-                             "$<$0.001" if pv <= 0.001 else f"{pv:.3f}"])
+                             "$\\le$0.001" if pv <= 0.001 else f"{pv:.3f}"])
             rows.append("MID")
-        parts.append("\\section{Statistical significance}\nPaired bootstrap over vehicles (1\\,000 resamples) of $\\Delta$AUROC = ECTA $-$ baseline (wear vs.\\ all); two-sided p-values.\n"
+        parts.append("\\section{Statistical significance}\nPaired bootstrap over vehicles (1\\,000 resamples) of $\\Delta$AUROC = ECTA $-$ baseline (wear vs.\\ all); two-sided p-values, whose resolution is 0.001. The sampling and polling corpora contain only three vehicles, so their vehicle-level bootstrap is coarse and their p-values should be read as indicative; the full-bus (six vehicles) and VED (381 vehicles) tests are the informative ones.\n"
                      + table("ECTA vs.\\ every baseline.", "tab:s_sig", ["Corpus", "Baseline", "$\\Delta$AUROC", "95\\% CI", "p"], rows[:-1],
                              size="\\scriptsize"))
     # S12 operating points

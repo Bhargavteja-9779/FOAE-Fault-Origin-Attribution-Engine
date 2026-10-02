@@ -269,9 +269,12 @@ def _bold_best(vals, fmt="{:.3f}"):
 
 def tables(corpora):
     """LaTeX table bodies written to ocwd/results/*.tex (pasted into the paper)."""
-    order = [PROP, "GBM w/o coherence", "GBM loss only", "1D-CNN (supervised)", "LSTM autoencoder",
-             "Isolation Forest", "One-class SVM", "Loss-rate threshold", "U-code timeout rule",
+    order = [PROP, "GBM w/o coherence", "GBM loss only", "1D-CNN (supervised)", "Transformer (supervised)",
+             "LSTM autoencoder", "Isolation Forest", "One-class SVM", "Loss-rate threshold", "U-code timeout rule",
              "Coherence test (no training)"]
+    tfx = {}
+    if (paths.RESULTS / "extra_transformer.json").exists():
+        tfx = json.load(open(paths.RESULTS / "extra_transformer.json", encoding="utf-8"))
     nice = {PROP: r"\textbf{ECTA (proposed)}", "GBM w/o coherence": "ECTA w/o coherence",
             "GBM loss only": "ECTA loss features only", "Coherence test (no training)": r"Coherence test $z_\beta$ (no training)"}
     R = {c: load(c) for c in corpora}
@@ -280,7 +283,8 @@ def tables(corpora):
     # Table: detection.  per corpus: AUROC(all), moderate-vs-healthy, severe-vs-healthy
     cols = {}
     for c in corpora:
-        cols[(c, "all")] = [R[c]["detection"].get(m, {}).get("auroc") for m in order]
+        cols[(c, "all")] = [R[c]["detection"].get(m, {}).get("auroc",
+                            tfx.get(c, {}).get("auroc_all") if m.startswith("Transformer") else None) for m in order]
         cols[(c, "s2")] = [X[c].get(m, {}).get("s2_vs_healthy") for m in order]
         cols[(c, "s3")] = [X[c].get(m, {}).get("s3_vs_healthy") for m in order]
     cols = {k: _bold_best(v) for k, v in cols.items()}

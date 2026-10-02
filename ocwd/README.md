@@ -38,11 +38,19 @@ bench protocol of the wider project).
 
 Set `OCWD_DATA` to use another location.
 
+## Documentation
+
+* `docs/PROJECT_GUIDE.md` (also `.docx`): what the project does, code map, results, how to extend
+* `docs/GIT_GUIDE.md` (also `.docx`): how to commit, push, open a pull request, tag a release, get a DOI
+* `../paper/SUBMISSION_CHECKLIST.md`: what to upload to IEEE Access and what is still missing
+
+One-command reproduction: `bash ocwd/get_data.sh && bash ocwd/run_all.sh`.
+
 ## Reproduce every number in the paper
 
 ```bash
 pip install numpy pandas scipy scikit-learn lightgbm torch pyarrow openpyxl matplotlib joblib pytest
-python -m pytest ocwd/tests -q                      # 11 unit tests, no data needed
+python -m pytest ocwd/tests -q                      # 14 unit tests, no data needed
 python -m ocwd.experiments.build                    # labelled windows, 3 seeds (~15 min)
 python -m ocwd.experiments.evaluate                 # detection + attribution tables (~40 min)
 python -m ocwd.experiments.accumulate               # multi-trip evidence pooling
@@ -51,6 +59,8 @@ python -m ocwd.experiments.summarize                # stage-vs-healthy, confound
 python -m ocwd.experiments.time_to_detect           # full-bus time-to-detect
 python -m ocwd.experiments.observability            # analytical observability law
 python -m ocwd.experiments.robustness fullbus ved   # model mis-specification
+python -m ocwd.experiments.extras oppoint crossmodel window hparam transformer significance
+python -m ocwd.experiments.supplement               # supplementary material (LaTeX)
 python -m ocwd.experiments.figures                  # all figures / LaTeX tables
 ```
 
