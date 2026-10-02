@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "foae"
+version = "0.1.0"
+description = "Fault-Origin Attribution Engine — vehicle diagnostics research"
+readme = "README.md"
+requires-python = ">=3.10"
+
+# Dependency list derived from module responsibilities in
+# FOAE_Project_Structure.md, not from a spec dependency table.
+dependencies = [
+    "numpy>=1.24",
+    "pandas>=2.0",
+    "scipy>=1.11",          # cross-correlation in probe/response.py
+    "networkx>=3.1",        # epdg/graph.py DiGraph subclass
+    "scikit-learn>=1.3",    # conformal calibration, metrics
+    "xgboost>=2.0",         # attribution residual model
+    "tensorflow>=2.15",     # MC-Dropout BNN -> models/bnn.keras
+    "matplotlib>=3.7",      # validation/reports.py plots
+]
+
+[project.optional-dependencies]
+dashboard = [
+    "streamlit>=1.30",
+]
+bench = [
+    "python-can>=4.3",      # bench/capture.py CAN logging
+    "pyserial>=3.5",
+]
+dev = [
+    "pytest>=7.4",
+    "pytest-cov>=4.1",
+    "ruff>=0.4",
+    "mypy>=1.8",
+    "jupyter>=1.0",
+]
+
+[tool.setuptools.packages.find]
+include = ["foae*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.mypy]
+python_version = "3.10"
+warn_unused_ignores = true
+disallow_untyped_defs = true
